@@ -1,17 +1,12 @@
-'''
-Created on 3 fevr. 2014
-
-@author: collet18u
-'''
-
 from FormesSimples import FormesSimples
+from Point import Point
 
 class Rectangles(FormesSimples):
-
-    def __init__(self, nom, point, couleur, longueur, largeur, ):
-        super(Rectangles,self).__init__(nom, point, couleur)
-        self._longueur = longueur
-        self._largeur = largeur
+     #numero de Rectangle pour créer le nom de chaque forme afin de differencier
+    numero = 0
+    def __init__(self, point1, point2, couleur):
+        Rectangles.numero += 1
+        super(Rectangles,self).__init__("Rectangle " + Rectangles.numero.__str__(), point1, point2, couleur)
         
     def _get_longueur(self):
         return self._longueur
@@ -30,6 +25,8 @@ class Rectangles(FormesSimples):
     largeur = property (_get_largeur, _set_largeur)
     
         
-    def write(self):
-        super().write()
+    def write(self, canvas, p1, p2):
+        super().write(canvas, p1, p2)
         
+        self._set_nom("Rectangle "+Rectangles.numero.__str__())
+        return canvas.create_rectangle(self._get_point1().x , self._get_point1().y , self._get_point2().x, self._get_point2().y, fill=self.couleur)

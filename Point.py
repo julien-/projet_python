@@ -1,9 +1,3 @@
-'''
-Created on 3 fevr. 2014
-
-@author: collet18u
-'''
-
 class Point:
 
     def __init__(self, x, y):
@@ -23,6 +17,9 @@ class Point:
 
     def _set_y(self, y):
         self._y = y
+    
+    def _set_point(self, p):
+        self = p
         
     y = property (_get_y, _set_y)
     

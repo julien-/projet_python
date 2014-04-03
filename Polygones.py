@@ -8,9 +8,9 @@ from FormesSimples import FormesSimples
 
 class Polygones(FormesSimples):
  
-    def __init__(self, nom, point, couleur, nbpoints, tuplepoints):
+    def __init__(self, nom, point1, point2, couleur, nbpoints, tuplepoints):
         if len(tuplepoints) == nbpoints:
-            super().__init__(nom, point, couleur)
+            super().__init__(nom, point1, point2, couleur)
             self._nbpoints = nbpoints
             self._tuplecoord = tuplepoints
         else:
