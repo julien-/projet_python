@@ -39,12 +39,12 @@ class FormesSimples(Formes):
         self._set_couleur(self.couleur);
         self._set_point1(Point(p1._get_x(), p1._get_y()));
         self._set_point2(Point(p2._get_x(), p2._get_y()));
-        print("Couleur : " + self._couleur.__str__())
+        #print("Couleur : " + self._couleur.__str__())
         print("Point1 : " + self._point1._get_x().__str__() + "," + self._point1._get_y().__str__())
         print("Point2 : " + self._point2._get_x().__str__() + "," + self._point2._get_y().__str__())
     
     def translation(self, x, y):
         super().translation()
-        
+        #Point1
         self._point1 = Point(self._point1._get_x() + x, self._point1._get_y() + y)
-        self._point2 = Point(self._point1._get_x() + x, self._point1._get_y() + y)
+        self._point2 = Point(self._point2._get_x() + x, self._point2._get_y() + y)
