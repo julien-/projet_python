@@ -240,8 +240,9 @@ class App:
             p2 = Point(self.forme_active._get_point2()._get_x() + y_vecteur , self.forme_active._get_point2()._get_y() + y_vecteur )
             self.forme_active._set_point1(p1)
             self.forme_active._set_point2(p2)
-            x = self.forme_active.write(self.cv, p1 , p2 )
-            self.map[i] = self.forme_active
+            self.idForme = self.forme_active.write(self.cv, p1 , p2 )
+            self.map[self.idForme] = self.forme_active
+            del self.map[i]
             self.majEntry()
             self.ClicDroit_depart = self.ClicDroit_fin
 #             copie = self.idForme
