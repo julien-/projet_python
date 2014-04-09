@@ -1,9 +1,3 @@
-'''
-Created on 17 mars 2014
-
-@author: collet18u
-'''
-
 from FormesSimples import FormesSimples
 
 class Triangles(FormesSimples):

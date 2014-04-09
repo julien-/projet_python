@@ -1,18 +1,11 @@
-'''
-Created on 17 mars 2014
-
-@author: collet18u
-'''
-
 from FormesSimples import FormesSimples
 
 class Segments(FormesSimples):
 
-    def __init__(self, nom, point, couleur, point1, point2):
-
-            super(Segments,self).__init__(nom, point, couleur)
-            self._point1 = point1
-            self._point2 = point2
+   #numero du segment pour créer le nom de chaque forme afin de differencier
+    numero = 0
+    def __init__(self, nom, point1, point2, couleur):
+        super(Segments,self).__init__(nom, point1, point2, couleur)
   
     def _get_point1(self):
         return self._point1
@@ -32,8 +25,7 @@ class Segments(FormesSimples):
     
 
         
-    def write(self):
-        super().write()
-        print("Coordonnee point1 : (" + str(self._point1._x) + "," + str(self._point1._y) + ")")
-        print("Coordonnee point2 : (" + str(self._point2._x) + "," + str(self._point2._y) + ")")
+    def write(self, canvas, p1, p2):
+        super().write(canvas, p1, p2)
+        return canvas.create_line(self._get_point1().x , self._get_point1().y , self._get_point2().x, self._get_point2().y, fill=self.couleur)
         

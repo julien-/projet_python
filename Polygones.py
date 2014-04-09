@@ -1,9 +1,3 @@
-'''
-Created on 3 fevr. 2014
-
-@author: collet18u
-'''
-
 from FormesSimples import FormesSimples
 
 class Polygones(FormesSimples):
@@ -35,6 +29,7 @@ class Polygones(FormesSimples):
     def write(self):
         super().write()
         print("Nombre de points : " + str(len(self._tuplecoord))) 
+        
         i = 0
         for i in range(len(self._tuplecoord)):
             print("Coordonnee point" + str(i+1) + " : (" + str(self._tuplecoord[i]._x) + "," + str(self._tuplecoord[i]._y) + ")")

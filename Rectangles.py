@@ -4,9 +4,8 @@ from Point import Point
 class Rectangles(FormesSimples):
      #numero de Rectangle pour créer le nom de chaque forme afin de differencier
     numero = 0
-    def __init__(self, point1, point2, couleur):
-        Rectangles.numero += 1
-        super(Rectangles,self).__init__("Rectangle " + Rectangles.numero.__str__(), point1, point2, couleur)
+    def __init__(self, nom, point1, point2, couleur):
+        super(Rectangles,self).__init__(nom, point1, point2, couleur)
         
     def _get_longueur(self):
         return self._longueur
@@ -28,5 +27,4 @@ class Rectangles(FormesSimples):
     def write(self, canvas, p1, p2):
         super().write(canvas, p1, p2)
         
-        self._set_nom("Rectangle "+Rectangles.numero.__str__())
-        return canvas.create_rectangle(self._get_point1().x , self._get_point1().y , self._get_point2().x, self._get_point2().y, fill=self.couleur)
+        #return canvas.create_rectangle(self._get_point1().x , self._get_point1().y , self._get_point2().x, self._get_point2().y, fill=self.couleur)

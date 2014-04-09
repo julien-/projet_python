@@ -8,21 +8,29 @@ from Ellipses import Ellipses
 from Point import Point
 from Polygones import Polygones
 from Rectangles import Rectangles
-
+from Segments import Segments
+from Fabrique import Fabrique
+from copy import deepcopy
 
 from Formes import Formes;
-
+from dessinerRectangle import dessinerRectangle;
+from dessinerEllipse import dessinerEllipse;
 
 class App:
     
     def __init__(self, root):
         #Liste des formes crees
         self.map = {}
-        
+        self.nbFormes = 0
         # Fenetre
         self.root = root
         self.root.title("Formes")
         
+        formes = [dessinerRectangle, dessinerEllipse]
+        self.fabrique = Fabrique()
+        for forme in formes:
+            self.fabrique.ajouter_forme(forme)
+            
         # Barre d'outils
         toolbar = Frame(root)
         toolbar.pack(expand =YES, fill =X, side =TOP)
@@ -44,12 +52,9 @@ class App:
         
         lc = Label(propriete, relief=RIDGE, text ='Couleur de la forme')
         lc.grid(row=1, column=0, sticky=NSEW)
-        self.Valeur_entry_couleur = StringVar()
-        self.entry_droite_couleur = Entry(propriete, relief=RIDGE, textvariable = self.Valeur_entry_couleur)
-        self.entry_droite_couleur.grid(row=1, column=1, sticky=NSEW)
+        self.label_droite_couleur = Label(propriete, relief=RIDGE)
+        self.label_droite_couleur.grid(row=1, column=1, sticky=NSEW)
         
-        self.bc = Button(propriete, text='...', command=self.changerCouleur)
-        self.bc.grid(row=1, column=2, sticky=NSEW)
         
         lp1 = Label(propriete, relief=RIDGE, text ='Point1 (X,Y)')
         lp1.grid(row=2, column=0, sticky=NSEW)
@@ -72,26 +77,30 @@ class App:
         self.entry_droite_zoom.grid(row=4, column=1, sticky=NSEW)
         
         cols.append(self.entry_droite_name)
-        cols.append(self.entry_droite_couleur)
+        cols.append(self.label_droite_couleur)
         cols.append(self.entry_droite_point1)
         cols.append(self.entry_droite_point2)
         rows.append(cols)
             
         # Boutons du haut
-        self.bouton = [None]*3
-        self.photos = [None]*3
+        self.bouton = [None]*4
+        self.photos = [None]*4
         
         self.photos[0] = PhotoImage(file = 'images/cercle.png');
-        self.bouton[0] = Button(toolbar, image = self.photos[0], relief =GROOVE, command = self.clic_btn_ellipse)
+        self.bouton[0] = Button(toolbar, image = self.photos[0], relief =GROOVE, command = lambda new_forme = Ellipses("Ellipse ", Point(0, 0) , Point(0,0) , self.color_name ):self.clic_btn_creation(new_forme))
         self.bouton[0].pack(side =LEFT)
         
         self.photos[1] = PhotoImage(file = 'images/rectangle.png');
-        self.bouton[1] = Button(toolbar, image = self.photos[1], relief =GROOVE, command = self.clic_btn_rectangle)
+        self.bouton[1] = Button(toolbar, image = self.photos[1], relief =GROOVE, command = lambda new_forme = Rectangles("Rectangle ",Point(0,0), Point(0, 0), self.color_name) :self.clic_btn_creation(new_forme))
         self.bouton[1].pack(side =LEFT)
         
         self.photos[2] = PhotoImage(file = 'images/polygone.png');
-        self.bouton[2] = Button(toolbar, image = self.photos[2], relief =GROOVE, command = lambda x = Polygones("Polygone 1", Point(1,1), Point(2,2), "rouge", 2, [Point(5, 4), Point(8, 6)]):self.dessiner_polygone(x))
+        self.bouton[2] = Button(toolbar, image = self.photos[2], relief =GROOVE, command = lambda new_forme = Ellipses("Polygone ", Point(0, 0), Point(0,0), self.color_name):self.dessiner_polygone(new_forme))
         self.bouton[2].pack(side =LEFT)
+
+        self.photos[3] = PhotoImage(file = 'images/segment.png');
+        self.bouton[3] = Button(toolbar, image = self.photos[3], relief =GROOVE, command = lambda new_forme = Segments("Segment ", Point(0, 0), Point(0,0), self.color_name):self.clic_btn_creation(new_forme))
+        self.bouton[3].pack(side =LEFT)
         
         # Canvas
         self.cv = Canvas(width=640, height=480, bg='black')
@@ -107,33 +116,59 @@ class App:
         self.entry_droite_name.bind('<Return>', self.modifByEdit)
         self.entry_droite_point1.bind('<Return>', self.modifByEdit)
         self.entry_droite_point2.bind('<Return>', self.modifByEdit)
+        self.label_droite_couleur.bind('<ButtonPress-1>', self.changerCouleur)
+        self.root.bind('<Delete>', self.supprimerForme)
         self.cv.pack()
                
-    def changerCouleur(self):
+    def changerCouleur(self, event):
+
         color = colorchooser.askcolor()
         self.color_name = color[1]
-        self.entry_droite_couleur.configure(background=self.color_name)
-        print("Changement de couleur entry_droite_name : ",self.color_name)
+        self.label_droite_couleur.configure(background=self.color_name)
+        self.forme_active._set_couleur(self.color_name)
         
+        self.regenererForme()
+        
+        print("Changement de couleur entry_droite_name : ",self.color_name)
+    
+    def supprimerForme(self, event):
+        items = self.cv.find_withtag('current')
+        #Si on selectionne une forme
+        if len(items):
+            del self.map[self.idForme]
+            self.cv.delete(root,self.idForme)
+
+            self.root.update()
+        
+
+    def regenererForme(self):
+        self.cv.delete(root, self.idForme)
+        self.forme_active.write(self.cv, self.forme_active._get_point1(), self.forme_active._get_point2())
+        newIdForme = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
+        self.map[newIdForme] = deepcopy(self.map[self.idForme])
+        del self.map[self.idForme]
+        print ("regeneration" + self.idForme.__str__())
+        self.idForme = newIdForme
+        self.map[self.idForme]._set_nom(self.entry_droite_name.get())
+        self.forme_active = self.map[self.idForme]
+        self.root.update()
+
     def modifByEdit(self, event):
         #active les ENTRY si une forme est selectionne
          
         if(self.forme_active._get_nom() != ""):
-            self.cv.delete(root,self.forme_active)
-            del self.map[self.idForme]
-            self.root.update()  
-            forme = Formes(self.entry_droite_name.get());
-            r = random.randint(50, 100)
-            idForme = self.cv.create_rectangle(self.entry_droite_point2.get(),  self.entry_droite_point1.get(), self.x+r, self.y+r, fill=self.color_name)
-            self.root.update()
+            
+            self.forme_active._set_couleur(self.color_name)
             self.x1, self.y1 =self.entry_droite_point1.get(), self.entry_droite_point2.get()
-            self.map[idForme] = forme
-            self.forme_active = idForme
+            
+            self.regenererForme()
+            
+            print ("modif")
             
     def majEntry(self):
         if(self.idForme is not None):
             self.Valeur_entry_nom.set(self.map[self.idForme]._get_nom())
-            self.Valeur_entry_couleur.set(self.map[self.idForme]._get_couleur())
+            self.label_droite_couleur.configure(background=self.map[self.idForme]._get_couleur())
             self.Valeur_entry_point1.set(self.map[self.idForme]._get_point1()._get_x().__str__() + "," + self.map[self.idForme]._get_point1()._get_y().__str__())
             self.Valeur_entry_point2.set(self.map[self.idForme]._get_point2()._get_x().__str__() + "," + self.map[self.idForme]._get_point2()._get_y().__str__())
         if(self.zoom > 0):
@@ -164,7 +199,8 @@ class App:
             print("dessinDown")
             try:
                 #id de la forme sur le canvas
-                self.idForme = self.forme_active.write(self.cv, Point(event.x, event.y), Point(event.x,event.y) )
+                self.forme_active.write(self.cv, Point(event.x, event.y), Point(event.x,event.y) )
+                self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
                 self.map[self.idForme] = self.forme_active
                 
             except:pass  #ne rien faire quand aucune action est selectionnee (clic dans le vide)
@@ -195,7 +231,7 @@ class App:
             print("VECTEURmoove: ("+ x_vecteur.__str__() +"," +y_vecteur.__str__()+")")
             print("EVENTmoove: ("+ event.x.__str__() +"," + event.y.__str__()+")")
             
-            
+
             #MAJ OBJET
             self.ClicGauche_depart = self.ClicGauche_fin
             self.map[self.idForme].translation(x_vecteur, y_vecteur)
@@ -213,8 +249,8 @@ class App:
                 
                 self.forme_active._set_point2(Point(event.x, event.y)) #MAJ forme active
                 
-                self.idForme = self.forme_active.write(self.cv, self.forme_active._get_point1(), self.forme_active._get_point2() )
-                
+                self.forme_active.write(self.cv, self.forme_active._get_point1(), self.forme_active._get_point2() )
+                self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
                 self.map[self.idForme] = self.forme_active
                 
                 self.majEntry()
@@ -240,7 +276,8 @@ class App:
             p2 = Point(self.forme_active._get_point2()._get_x() + y_vecteur , self.forme_active._get_point2()._get_y() + y_vecteur )
             self.forme_active._set_point1(p1)
             self.forme_active._set_point2(p2)
-            self.idForme = self.forme_active.write(self.cv, p1 , p2 )
+            self.forme_active.write(self.cv, p1 , p2 )
+            self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
             self.map[self.idForme] = self.forme_active
             del self.map[i]
             self.majEntry()
@@ -272,7 +309,18 @@ class App:
        
             
         
+    def clic_btn_creation(self, forme):
+        print(forme)
+        self.nbFormes = self.nbFormes + 1
         
+        type(forme).numero += 1
+        self.forme_active = deepcopy(forme)
+        self.forme_active._set_nom(self.forme_active._get_nom()+ type(forme).numero.__str__())
+        #self.forme_active._set_nom("Forme " + self.nbFormes.__str__())
+        print (Rectangles.numero.__str__())
+       
+        
+        print(type(forme).numero.__str__()) 
         
         
     def clic_btn_ellipse(self):
@@ -286,6 +334,4 @@ class App:
 root = Tk()
 app = App(root)
 root.mainloop()
-
-#test
 
