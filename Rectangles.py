@@ -24,7 +24,7 @@ class Rectangles(FormesSimples):
     largeur = property (_get_largeur, _set_largeur)
     
         
-    def write(self, canvas, p1, p2):
-        super().write(canvas, p1, p2)
+    def write(self, p1, p2):
+        super().write(p1, p2)
         
         #return canvas.create_rectangle(self._get_point1().x , self._get_point1().y , self._get_point2().x, self._get_point2().y, fill=self.couleur)

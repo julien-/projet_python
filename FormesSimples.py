@@ -33,8 +33,8 @@ class FormesSimples(Formes):
     point1 = property (_get_point1, _set_point1)
     point2 = property (_get_point2, _set_point2)
         
-    def write(self, canvas, p1, p2):
-        super().write(canvas, p1, p2)
+    def write(self, p1, p2):
+        super().write(p1, p2)
         
         self._set_couleur(self.couleur);
         self._set_point1(Point(p1._get_x(), p1._get_y()));
