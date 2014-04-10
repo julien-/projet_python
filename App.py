@@ -16,6 +16,7 @@ from Formes import Formes;
 from dessinerRectangle import dessinerRectangle;
 from dessinerEllipse import dessinerEllipse;
 from dessinerSegment import dessinerSegment;
+from dessinerPolygone import dessinerPolygone;
 
 class App:
     
@@ -33,7 +34,7 @@ class App:
         self.root = root
         self.root.title("Formes")
         
-        formes = [dessinerRectangle, dessinerEllipse, dessinerSegment]
+        formes = [dessinerRectangle, dessinerEllipse, dessinerSegment, dessinerPolygone]
         self.fabrique = Fabrique()
         for forme in formes:
             self.fabrique.ajouter_forme(forme)
