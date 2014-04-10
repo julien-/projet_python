@@ -1,5 +1,3 @@
-
-
 class Formes:
     
     def __init__(self, nom):
