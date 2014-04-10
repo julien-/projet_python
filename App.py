@@ -179,7 +179,6 @@ class App:
 
     def regenererForme(self):
         self.cv.delete(root, self.idForme)
-        self.forme_active.maj(self.forme_active._get_point1(), self.forme_active._get_point2())
         self.forme_active.write()
         newIdForme = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
         self.map[newIdForme] = deepcopy(self.map[self.idForme])
