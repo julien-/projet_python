@@ -246,6 +246,7 @@ class App:
         self.root.update()
 
     def onMouseUp(self, event):
+        self.forme_active = None
         print("lache")
         
     #bouge la souris + clic gauche
@@ -294,6 +295,8 @@ class App:
                 
                 self.majEntry()
             except: pass #ne rien faire quand aucune action est selectionnee (clic dans le vide)
+    
+    
     def onClicZoom(self, event):
         print("Clic Droit")
         print ("MAP: " + self.map.__str__())
@@ -315,17 +318,15 @@ class App:
             p2 = Point(self.forme_active._get_point2()._get_x() + y_vecteur , self.forme_active._get_point2()._get_y() + y_vecteur )
             self.forme_active._set_point1(p1)
             self.forme_active._set_point2(p2)
-            self.forme_active.maj(p1, p2)
-            self.forme_active.write()
+            
+            self.forme_active.write(p1 , p2 )
             self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
             self.map[self.idForme] = self.forme_active
             del self.map[i]
             self.majEntry()
             self.ClicDroit_depart = self.ClicDroit_fin
 #             copie = self.idForme
-            
-#             
-        
+       
         
 
         #MAJ forme active
@@ -363,13 +364,6 @@ class App:
         print(type(forme).numero.__str__()) 
         
         
-    def clic_btn_ellipse(self):
-        print("Creation Ellipse")
-        self.forme_active =  Ellipses(Point(0, 0), Point(0,0), self.color_name)
-        
-    def clic_btn_rectangle(self):
-        print("Creation Rectangle")
-        self.forme_active =  Rectangles(Point(0,0), Point(0, 0), self.color_name) 
         
 root = Tk()
 app = App(root)
