@@ -15,5 +15,7 @@ class Formes:
     
     def write(self): pass
     
+    def maj(self): pass
+    
     def translation(self): pass
     
