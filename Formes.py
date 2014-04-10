@@ -15,5 +15,5 @@ class Formes:
     
     def write(self): pass
     
-    def translation(self): pass #pass c'est quand une fonction ne fait rien (virtuelle pure en gros)
+    def translation(self): pass
     
