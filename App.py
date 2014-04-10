@@ -25,6 +25,9 @@ class App:
         self.nbFormes = 0
         
         self.tabpoints = [None]*6
+        self.TabPoint = [None]*5
+        self.i = 0
+        self.j = 0
         
         # Fenetre
         self.root = root
@@ -137,6 +140,30 @@ class App:
         self.regenererForme()
         
         print("Changement de couleur entry_droite_name : ",self.color_name)
+        
+    def onMouseMolette(self, event):
+        self.TabPoint[self.i] = Point(event.x, event.y)
+        if(self.i == self.forme_active._get_nbpoints()-1):
+            if(self.forme_active._get_nbpoints() == 3):
+                self.tabpoints[0]=(self.TabPoint[self.i].x)
+                self.tabpoints[1]=(self.TabPoint[self.i].y)
+            else:
+                self.tabpoints[self.forme_active._get_nbpoints()-1]=(self.TabPoint[self.i].x)
+                self.tabpoints[self.forme_active._get_nbpoints()]=(self.TabPoint[self.i].y)
+            print(self.tabpoints)
+            self.forme_active.maj(Point(self.TabPoint[0].x, self.TabPoint[0].y), Point(self.TabPoint[1].x,self.TabPoint[1].y), self.forme_active._get_nbpoints(), self.tabpoints)
+            self.forme_active.write()
+            self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
+            self.map[self.idForme] = self.forme_active
+            self.majEntry()
+            self.i = 0
+            self.j = 0
+        else:
+            if(self.i >1):
+                self.tabpoints[self.j]=(self.TabPoint[self.i].x)
+                self.tabpoints[self.j+1]=(self.TabPoint[self.i].y)
+                self.j = self.j+2
+            self.i = self.i+1
     
     def supprimerForme(self, event):
         items = self.cv.find_withtag('current')

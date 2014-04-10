@@ -2,13 +2,11 @@ from FormesSimples import FormesSimples
 
 class Polygones(FormesSimples):
  
-    def __init__(self, nom, point1, point2, couleur, nbpoints, tuplepoints):
-        if len(tuplepoints) == nbpoints:
-            super().__init__(nom, point1, point2, couleur)
-            self._nbpoints = nbpoints
-            self._tuplecoord = tuplepoints
-        else:
-            print("Erreur initialisation")
+    numero = 0
+    def __init__(self, nom, point1, point2, couleur, nbpoints, tabpoints):
+        super(Polygones,self).__init__(nom, point1, point2, couleur)
+        self._nbpoints = nbpoints
+        self._tabpoints = tabpoints
 
     def _get_nbpoints(self):
         return self._nbpoints
@@ -18,18 +16,29 @@ class Polygones(FormesSimples):
 
     nbpoints = property (_get_nbpoints, _set_nbpoints)
     
-    def _get_tuplecoord(self):
-        return self._tuplecoord
+    def _get_tabpoints(self):
+        return self._tabpoints
 
-    def _set_tuplecoord(self, tuplecoord):
-        self._tuplecoord = tuplecoord
+    def _set_tabpoints(self, tabpoints):
+        self._tabpoints = tabpoints
 
-    tuplecoord = property (_get_tuplecoord, _set_tuplecoord)
+    tabpoints = property (_get_tabpoints, _set_tabpoints)
+    
+    def maj(self, p1, p2, nbpoints, tabpoints):       
+        super().maj(p1, p2)
+        self._set_nbpoints(nbpoints)
+        self._set_tabpoints(tabpoints)
     
     def write(self):
         super().write()
-        print("Nombre de points : " + str(len(self._tuplecoord))) 
         
         i = 0
-        for i in range(len(self._tuplecoord)):
-            print("Coordonnee point" + str(i+1) + " : (" + str(self._tuplecoord[i]._x) + "," + str(self._tuplecoord[i]._y) + ")")
+        j = 3
+        while (i < len(self._tabpoints)-1):
+            print("Point" + str(j) + " : " + str(self._tabpoints[i]) + "," + str(self._tabpoints[i+1]))
+            i = i+2
+            j = j+1
+            
+    
+
+        
