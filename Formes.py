@@ -13,10 +13,7 @@ class Formes:
         
     nom = property (_get_nom, _set_nom)
     
-    def write(self, p1, p2): pass
-        #print("DESSIN")
-        #print("Nom : " + self._nom)
+    def write(self): pass
     
     def translation(self): pass #pass c'est quand une fonction ne fait rien (virtuelle pure en gros)
     
-    def construire(self): pass
