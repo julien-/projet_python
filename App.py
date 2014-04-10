@@ -122,6 +122,7 @@ class App:
         self.cv.bind("<Button1-Motion>", self.onMouseMove)
         self.cv.bind("<ButtonPress-3>", self.onClicZoom)
         self.cv.bind("<Button3-Motion>", self.onZoomMove)
+        self.cv.bind("<Button-2>", self.onMouseMolette)
         #Entry
         self.entry_droite_name.bind('<Return>', self.modifByEdit)
         self.entry_droite_point1.bind('<Return>', self.modifByEdit)
