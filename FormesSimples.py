@@ -54,5 +54,4 @@ class FormesSimples(Formes):
         #Point1
         self._point1 = Point(self._point1._get_x() + x, self._point1._get_y() + y)
         self._point2 = Point(self._point2._get_x() + x, self._point2._get_y() + y)
-    
         

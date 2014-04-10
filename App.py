@@ -222,6 +222,7 @@ class App:
         
         if len(items):
             print("selection forme")
+            self.PeutDessiner = 0
             
             self.idForme = items[0]
             self.forme_active = self.map[self.idForme]
@@ -233,20 +234,23 @@ class App:
             
             print ("NOM: " +  self.forme_active._get_nom())
         else:
-            print("dessinDown")
-            try:
-                #id de la forme sur le canvas
-                self.forme_active.maj(Point(event.x, event.y), Point(event.x,event.y))
-                self.forme_active.write()
-                self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
-                self.map[self.idForme] = self.forme_active
-                
-            except:pass  #ne rien faire quand aucune action est selectionnee (clic dans le vide)
+            if self.PeutDessiner :
+                self.PeutDessiner = 0
+                print("dessinDown")
+                try:
+                    #id de la forme sur le canvas
+                    self.forme_active.maj(Point(event.x, event.y), Point(event.x,event.y))
+                    self.forme_active.write()
+                    self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
+                    self.map[self.idForme] = self.forme_active
+                    
+                except:pass  #ne rien faire quand aucune action est selectionnee (clic dans le vide)
         self.majEntry()
         self.root.update()
 
     def onMouseUp(self, event):
-        self.forme_active = None
+        if self.PeutDessiner == 0:
+            self.forme_active = None
         print("lache")
         
     #bouge la souris + clic gauche
@@ -304,53 +308,31 @@ class App:
     
     def onZoomMove(self, event):
         print("Bouge clic Droit")
+        
+        #recupere l'endroit actuel de la souris
         self.ClicDroit_fin = Point(event.x, event.y)
+        
         #difference entre anciennes et nouvelles coordonees (donc calcul du vecteur)
         y_vecteur = self.ClicDroit_fin.y - self.ClicDroit_depart.y
+        
+        print("VECTEUR=" + y_vecteur.__str__())
+        
         print("zoom=" + self.zoom.__str__())
-        self.zoom = self.zoom - y_vecteur
-        for i in self.map: #parcours de TOUTES LES FORMES DESSINES
-            print("i="+i.__str__())
-           
-            self.cv.delete(i) #supprime l'ancienne forme du canvas
-            self.forme_active = self.map[i] #copie intermediaire (forme_active a associer au CANVAS )
-            p1 = Point(self.forme_active._get_point1()._get_x() - y_vecteur , self.forme_active._get_point1()._get_y() - y_vecteur )
-            p2 = Point(self.forme_active._get_point2()._get_x() + y_vecteur , self.forme_active._get_point2()._get_y() + y_vecteur )
-            self.forme_active._set_point1(p1)
-            self.forme_active._set_point2(p2)
-            
-            self.forme_active.write(p1 , p2 )
-            self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
-            self.map[self.idForme] = self.forme_active
-            del self.map[i]
-            self.majEntry()
-            self.ClicDroit_depart = self.ClicDroit_fin
-#             copie = self.idForme
-       
+        self.zoom = self.zoom +y_vecteur
         
-
-        #MAJ forme active
-#             self.forme_active = self.map[self.idForme]
-#             print("ZOOM avant"+self.zoom.__str__())
-#             x1 = self.forme_active._get_point1()._get_x()
-#             print("ZOOM avant"+self.zoom.__str__())
-#             print("x1 " + x1.__str__())
+        if y_vecteur < 0:
+            ratio=0.9
+        else:
+            ratio=1.1
         
-#             p1 = Point( ,)
-#             p2 = Point( ,)
-#             
-            
-# #             
-            
-            
-#             
-        #MAJ OBJET
+        self.cv.scale(ALL, self.ClicDroit_fin.x, self.ClicDroit_fin.y , ratio, ratio)
         
         
-       
-            
+        self.ClicDroit_depart = self.ClicDroit_fin
+        self.majEntry()
         
     def clic_btn_creation(self, forme):
+        self.PeutDessiner = 1
         print(forme)
         self.nbFormes = self.nbFormes + 1
         
