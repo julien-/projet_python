@@ -23,6 +23,9 @@ class App:
         #Liste des formes crees
         self.map = {}
         self.nbFormes = 0
+        
+        self.tabpoints = [None]*6
+        
         # Fenetre
         self.root = root
         self.root.title("Formes")
@@ -84,8 +87,8 @@ class App:
         rows.append(cols)
             
         # Boutons du haut
-        self.bouton = [None]*4
-        self.photos = [None]*4
+        self.bouton = [None]*5
+        self.photos = [None]*5
         
         self.photos[0] = PhotoImage(file = 'images/cercle.png');
         self.bouton[0] = Button(toolbar, image = self.photos[0], relief =GROOVE, command = lambda new_forme = Ellipses("Ellipse ", Point(0, 0) , Point(0,0) , self.color_name ):self.clic_btn_creation(new_forme))
@@ -96,13 +99,16 @@ class App:
         self.bouton[1].pack(side =LEFT)
         
         self.photos[2] = PhotoImage(file = 'images/polygone.png');
-        self.bouton[2] = Button(toolbar, image = self.photos[2], relief =GROOVE, command = lambda new_forme = Ellipses("Polygone ", Point(0, 0), Point(0,0), self.color_name):self.dessiner_polygone(new_forme))
+        self.bouton[2] = Button(toolbar, image = self.photos[2], relief =GROOVE, command = lambda new_forme = Polygones("Polygone ", Point(0,0), Point(0,0), self.color_name, 3, self.tabpoints):self.clic_btn_creation(new_forme))
         self.bouton[2].pack(side =LEFT)
 
         self.photos[3] = PhotoImage(file = 'images/segment.png');
         self.bouton[3] = Button(toolbar, image = self.photos[3], relief =GROOVE, command = lambda new_forme = Segments("Segment ", Point(0, 0), Point(0,0), self.color_name):self.clic_btn_creation(new_forme))
         self.bouton[3].pack(side =LEFT)
         
+        self.photos[4] = PhotoImage(file = 'images/triangle.png');
+        self.bouton[4] = Button(toolbar, image = self.photos[4], relief =GROOVE, command = lambda new_forme = Polygones("Triangle ", Point(0,0), Point(0,0), self.color_name, 3, self.tabpoints):self.clic_btn_creation(new_forme))
+        self.bouton[4].pack(side =LEFT)
         # Canvas
         self.cv = Canvas(width=640, height=480, bg='black')
         #self.colorList = ["blue", "red", "green", "white", "yellow", "magenta", "orange"]
@@ -153,6 +159,7 @@ class App:
         self.map[self.idForme]._set_nom(self.entry_droite_name.get())
         self.forme_active = self.map[self.idForme]
         self.root.update()
+        
 
     def modifByEdit(self, event):
         #active les ENTRY si une forme est selectionne
