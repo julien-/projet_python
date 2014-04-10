@@ -150,7 +150,8 @@ class App:
 
     def regenererForme(self):
         self.cv.delete(root, self.idForme)
-        self.forme_active.write(self.forme_active._get_point1(), self.forme_active._get_point2())
+        self.forme_active.maj(self.forme_active._get_point1(), self.forme_active._get_point2())
+        self.forme_active.write()
         newIdForme = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
         self.map[newIdForme] = deepcopy(self.map[self.idForme])
         del self.map[self.idForme]
@@ -207,7 +208,8 @@ class App:
             print("dessinDown")
             try:
                 #id de la forme sur le canvas
-                self.forme_active.write(Point(event.x, event.y), Point(event.x,event.y) )
+                self.forme_active.maj(Point(event.x, event.y), Point(event.x,event.y))
+                self.forme_active.write()
                 self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
                 self.map[self.idForme] = self.forme_active
                 
@@ -257,7 +259,8 @@ class App:
                 
                 self.forme_active._set_point2(Point(event.x, event.y)) #MAJ forme active
                 
-                self.forme_active.write(self.forme_active._get_point1(), self.forme_active._get_point2() )
+                self.forme_active.maj(self.forme_active._get_point1(), self.forme_active._get_point2())
+                self.forme_active.write()
                 self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
                 self.map[self.idForme] = self.forme_active
                 
@@ -284,7 +287,8 @@ class App:
             p2 = Point(self.forme_active._get_point2()._get_x() + y_vecteur , self.forme_active._get_point2()._get_y() + y_vecteur )
             self.forme_active._set_point1(p1)
             self.forme_active._set_point2(p2)
-            self.forme_active.write(p1 , p2 )
+            self.forme_active.maj(p1, p2)
+            self.forme_active.write()
             self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
             self.map[self.idForme] = self.forme_active
             del self.map[i]
