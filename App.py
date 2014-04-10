@@ -140,7 +140,7 @@ class App:
     
     def supprimerForme(self, event):
         items = self.cv.find_withtag('current')
-        #Si on selectionne une forme
+        #Si on selectionne une formes
         if len(items):
             del self.map[self.idForme]
             self.cv.delete(root,self.idForme)
