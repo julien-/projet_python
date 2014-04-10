@@ -102,7 +102,7 @@ class App:
         self.bouton[1].pack(side =LEFT)
         
         self.photos[2] = PhotoImage(file = 'images/polygone.png');
-        self.bouton[2] = Button(toolbar, image = self.photos[2], relief =GROOVE, command = lambda new_forme = Polygones("Polygone ", Point(0,0), Point(0,0), self.color_name, 3, self.tabpoints):self.clic_btn_creation(new_forme))
+        self.bouton[2] = Button(toolbar, image = self.photos[2], relief =GROOVE, command = lambda new_forme = Polygones("Polygone ", Point(0,0), Point(0,0), self.color_name, 5, self.tabpoints):self.clic_btn_creation(new_forme))
         self.bouton[2].pack(side =LEFT)
 
         self.photos[3] = PhotoImage(file = 'images/segment.png');
