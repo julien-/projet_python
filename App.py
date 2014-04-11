@@ -204,6 +204,10 @@ class App:
             
     def majEntry(self):
         if(self.idForme is not None):
+            print("=========majEntry=========")
+            print ("IDFORME :" + self.idForme.__str__())
+            print ("MAP: " + self.map.__str__())
+            print ("FORMEACTIVE: " +  self.forme_active._get_nom())
             self.Valeur_entry_nom.set(self.map[self.idForme]._get_nom())
             self.label_droite_couleur.configure(background=self.map[self.idForme]._get_couleur())
             self.Valeur_entry_point1.set(self.map[self.idForme]._get_point1()._get_x().__str__() + "," + self.map[self.idForme]._get_point1()._get_y().__str__())
@@ -222,7 +226,6 @@ class App:
         
         if len(items):
             print("selection forme")
-            self.PeutDessiner = 0
             
             self.idForme = items[0]
             self.forme_active = self.map[self.idForme]
@@ -234,23 +237,22 @@ class App:
             
             print ("NOM: " +  self.forme_active._get_nom())
         else:
-            if self.PeutDessiner :
-                self.PeutDessiner = 0
+            try:
                 print("dessinDown")
-                try:
+                if self.PeutDessiner == 1 :
                     #id de la forme sur le canvas
                     self.forme_active.maj(Point(event.x, event.y), Point(event.x,event.y))
                     self.forme_active.write()
                     self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
                     self.map[self.idForme] = self.forme_active
-                    
-                except:pass  #ne rien faire quand aucune action est selectionnee (clic dans le vide)
+                
+            except:pass  #ne rien faire quand aucune action est selectionnee (clic dans le vide)
         self.majEntry()
-        self.root.update()
+        #self.root.update()
 
     def onMouseUp(self, event):
-        if self.PeutDessiner == 0:
-            self.forme_active = None
+        if self.PeutDessiner == 1 : 
+            self.PeutDessiner = 0
         print("lache")
         
     #bouge la souris + clic gauche
@@ -286,18 +288,19 @@ class App:
             #modifie le dessin
             
             try:
-                print("NOMdown:" + self.forme_active._get_nom())
-                self.cv.delete(self.idForme) #supprime l'ancienne forme du canvas
-                del self.map[self.idForme]  #supprime l'ancinne forme de la map
-                
-                self.forme_active._set_point2(Point(event.x, event.y)) #MAJ forme active
-                
-                self.forme_active.maj(self.forme_active._get_point1(), self.forme_active._get_point2())
-                self.forme_active.write()
-                self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
-                self.map[self.idForme] = self.forme_active
-                
-                self.majEntry()
+                if self.PeutDessiner == 1 :
+                    print("NOMdown:" + self.forme_active._get_nom())
+                    self.cv.delete(self.idForme) #supprime l'ancienne forme du canvas
+                    del self.map[self.idForme]  #supprime l'ancinne forme de la map
+                    
+                    self.forme_active._set_point2(Point(event.x, event.y)) #MAJ forme active
+                    
+                    self.forme_active.maj(self.forme_active._get_point1(), self.forme_active._get_point2())
+                    self.forme_active.write()
+                    self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
+                    self.map[self.idForme] = self.forme_active
+                    
+                    self.majEntry()
             except: pass #ne rien faire quand aucune action est selectionnee (clic dans le vide)
     
     
