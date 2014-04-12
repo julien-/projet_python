@@ -196,10 +196,17 @@ class App:
         if(self.forme_active._get_nom() != ""):
             
             self.forme_active._set_couleur(self.color_name)
+            pos = self.entry_droite_point1.get().find(',')
+            
+            difference = [self.forme_active._get_point1()._get_x() - (int(self.entry_droite_point1.get()[0:pos])), self.forme_active._get_point1()._get_y() - int(self.entry_droite_point1.get()[pos+1: len(self.entry_droite_point1.get())])]
+            
+            self.forme_active._set_point1(Point(int(self.entry_droite_point1.get()[0:pos]), int(self.entry_droite_point1.get()[pos+1: len(self.entry_droite_point1.get())])))
+            self.forme_active._set_point2(Point(self.forme_active._get_point2()._get_x() - difference[0], self.forme_active._get_point2()._get_y() - difference[1]))
+
             self.x1, self.y1 =self.entry_droite_point1.get(), self.entry_droite_point2.get()
             
             self.regenererForme()
-            
+            self.majEntry()
             print ("modif")
             
     def majEntry(self):
@@ -264,24 +271,30 @@ class App:
         #Recupere la forme selectionnee
         items = self.cv.find_withtag('current')
         #Si on selectionne une forme
+        
         if len(items):
             x_vecteur, y_vecteur = self.ClicGauche_fin.x - self.ClicGauche_depart.x , self.ClicGauche_fin.y - self.ClicGauche_depart.y   #difference entre anciennes et nouvelles coordonees (donc calcul du vecteur)
-        
-            #MAJ Canvas
-            self.cv.move(self.idForme, x_vecteur, y_vecteur)
-            print ("MAPmoove: " + self.map.__str__())
-            print ("IDmoove: " + self.idForme.__str__())
+            print (self.cv.winfo_width().__str__())
+            if (((self.map[self.idForme])._get_point1()._get_x() + x_vecteur) >= 0) and (((self.map[self.idForme])._get_point2()._get_x() + x_vecteur) <= self.cv.winfo_width() and (((self.map[self.idForme])._get_point1()._get_y() + y_vecteur) >= 0) and (((self.map[self.idForme])._get_point2()._get_y() + y_vecteur) <= self.cv.winfo_height())):
+                print ("entre  a " + ((self.map[self.idForme])._get_point1()._get_x() + x_vecteur).__str__())
+                #MAJ Canvas
+                self.cv.move(self.idForme, x_vecteur, y_vecteur)
+                print ("MAPmoove: " + self.map.__str__())
+                print ("IDmoove: " + self.idForme.__str__())
+                
+                print ("NOMmoove: " +  self.forme_active._get_nom())
+                print("VECTEURmoove: ("+ x_vecteur.__str__() +"," +y_vecteur.__str__()+")")
+                print("EVENTmoove: ("+ event.x.__str__() +"," + event.y.__str__()+")")
+                
+    
+                #MAJ OBJET
+                self.ClicGauche_depart = self.ClicGauche_fin
+                self.map[self.idForme].translation(x_vecteur, y_vecteur)
+                
+                self.majEntry()
+            else:
+                print ("entre PAS a " + ((self.map[self.idForme])._get_point1()._get_x() - x_vecteur).__str__())
             
-            print ("NOMmoove: " +  self.forme_active._get_nom())
-            print("VECTEURmoove: ("+ x_vecteur.__str__() +"," +y_vecteur.__str__()+")")
-            print("EVENTmoove: ("+ event.x.__str__() +"," + event.y.__str__()+")")
-            
-
-            #MAJ OBJET
-            self.ClicGauche_depart = self.ClicGauche_fin
-            self.map[self.idForme].translation(x_vecteur, y_vecteur)
-            
-            self.majEntry()
         else:
             print("dessinMove")
             
