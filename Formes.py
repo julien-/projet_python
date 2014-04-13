@@ -16,3 +16,5 @@ class Formes:
     def maj(self): pass
     
     def translation(self): pass
+    
+    def zoom(self): pass

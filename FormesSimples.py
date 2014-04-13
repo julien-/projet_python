@@ -51,7 +51,35 @@ class FormesSimples(Formes):
     
     def translation(self, x, y):
         super().translation()
-        #Point1
+        #Modif des points
         self._point1 = Point(self._point1._get_x() + x, self._point1._get_y() + y)
         self._point2 = Point(self._point2._get_x() + x, self._point2._get_y() + y)
+    
+    def zoom(self, coef):
+        super().zoom()
+        #Modif des points
+        AModifX = round( ((self._get_largeur() * coef) - self._get_largeur()) / 2 , 2)
+        AModifY = round( ((self._get_hauteur() * coef) - self._get_hauteur()) / 2 , 2 )
         
+        self._point1 = Point(self._point1._get_x() - AModifX, self._point1._get_y() - AModifY)
+        self._point2 = Point(self._point2._get_x() + AModifX, self._point2._get_y() + AModifY)
+        
+    def _get_hauteur(self):
+        return round(abs(self._point1._get_y() - self._get_point2()._get_y()), 2)
+    
+    def _get_largeur(self):
+        return round(abs(self._point1._get_x() - self._get_point2()._get_x()), 2)
+    
+    def _get_milieu(self):
+        #X
+        if self._point1._get_x() < self._point2._get_x() :
+            x = self._point1._get_x() + self._get_largeur() / 2
+        else:
+            x = self._point2._get_x() + self._get_largeur() / 2
+        #Y
+        if self._point1._get_y() < self._point2._get_y() :
+            y = self._point1._get_y() + self._get_hauteur() / 2
+        else:
+            y = self._point2._get_y() + self._get_hauteur() / 2
+        
+        return Point(x, y)

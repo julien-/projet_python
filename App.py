@@ -317,22 +317,49 @@ class App:
         
         #difference entre anciennes et nouvelles coordonees (donc calcul du vecteur)
         y_vecteur = self.ClicDroit_fin.y - self.ClicDroit_depart.y
-        
+        coef = 0 #Aucun changement
         print("VECTEUR=" + y_vecteur.__str__())
         
         print("zoom=" + self.zoom.__str__())
         self.zoom = self.zoom +y_vecteur
         
         if y_vecteur < 0:
-            ratio=0.9
+            coef=0.9    #-10%
         else:
-            ratio=1.1
+            coef=1.1    #+10%
         
-        self.cv.scale(ALL, self.ClicDroit_fin.x, self.ClicDroit_fin.y , ratio, ratio)
-        
-        
-        self.ClicDroit_depart = self.ClicDroit_fin
-        self.majEntry()
+        if coef != 0:
+            
+            print ("MAP AVANT: " + self.map.__str__())
+            
+            map_copie = deepcopy(self.map) #copie intermediaire sinon boucle infinie
+            for i in map_copie: #parcours de TOUTES LES FORMES DESSINES
+                self.cv.delete(i) #supprime l'ancienne forme du canvas
+                print("i="+i.__str__())
+                self.forme_active = self.map[i] #copie intermediaire (forme_active a associer au CANVAS )
+                del self.map[i]
+                #Agrandit/Retrecit l'objet
+                self.forme_active.zoom(coef)
+                
+                #----------Deplace selon l'endroit du clic pour pouvoir chosir son endroit du zoom
+                #Difference entre l'endroit du clic et le milieu de la forme
+                DistanceX = self.ClicDroit_fin._get_x() - self.forme_active._get_milieu()._get_x()
+                DistanceY = self.ClicDroit_fin._get_y() - self.forme_active._get_milieu()._get_y()
+                #Deplace selon le coef
+                self.forme_active.translation( DistanceX - DistanceX * coef, DistanceY - DistanceY * coef)
+                #Garde la forme selectionnee 
+                if i == self.idForme:
+                    self.idForme = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
+                    self.map[self.idForme] = self.forme_active
+                else:
+                    j = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
+                    self.map[j] = self.forme_active
+                
+             
+            print ("MAP APRES: " + self.map.__str__())
+            
+            self.ClicDroit_depart = self.ClicDroit_fin
+            self.majEntry()
         
     def clic_btn_creation(self, forme):
         self.PeutDessiner = 1
@@ -344,12 +371,8 @@ class App:
         self.forme_active._set_nom(self.forme_active._get_nom()+ type(forme).numero.__str__())
         #self.forme_active._set_nom("Forme " + self.nbFormes.__str__())
         print (Rectangles.numero.__str__())
-       
-        
         print(type(forme).numero.__str__()) 
-        
-        
-        
+           
 root = Tk()
 app = App(root)
 root.mainloop()
