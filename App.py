@@ -77,12 +77,25 @@ class App:
         self.entry_droite_point2 = Entry(propriete, relief=RIDGE, textvariable = self.Valeur_entry_point2)
         self.entry_droite_point2.grid(row=3, column=1, sticky=NSEW)
         
+        lhauteur = Label(propriete, relief=RIDGE, text ='Hauteur')
+        lhauteur.grid(row=4, column=0, sticky=NSEW)
+        self.Valeur_entry_hauteur = StringVar()
+        self.entry_droite_hauteur = Entry(propriete, relief=RIDGE, textvariable = self.Valeur_entry_hauteur)
+        self.entry_droite_hauteur.grid(row=4, column=1, sticky=NSEW)
+        
+        llargeur = Label(propriete, relief=RIDGE, text ='Largeur')
+        llargeur.grid(row=5, column=0, sticky=NSEW)
+        self.Valeur_entry_largeur = StringVar()
+        self.entry_droite_largeur = Entry(propriete, relief=RIDGE, textvariable = self.Valeur_entry_largeur)
+        self.entry_droite_largeur.grid(row=5, column=1, sticky=NSEW)
+        
+        
         lz = Label(propriete, relief=RIDGE, text ='Zoom')
-        lz.grid(row=4, column=0, sticky=NSEW)
+        lz.grid(row=6, column=0, sticky=NSEW)
         self.Valeur_entry_zoom = StringVar()
         self.Valeur_entry_zoom.set( self.zoom.__str__())
         self.entry_droite_zoom = Entry(propriete, relief=RIDGE, textvariable = self.Valeur_entry_zoom)
-        self.entry_droite_zoom.grid(row=4, column=1, sticky=NSEW)
+        self.entry_droite_zoom.grid(row=6, column=1, sticky=NSEW)
         
         cols.append(self.entry_droite_name)
         cols.append(self.label_droite_couleur)
@@ -219,6 +232,8 @@ class App:
             self.label_droite_couleur.configure(background=self.map[self.idForme]._get_couleur())
             self.Valeur_entry_point1.set(self.map[self.idForme]._get_point1()._get_x().__str__() + "," + self.map[self.idForme]._get_point1()._get_y().__str__())
             self.Valeur_entry_point2.set(self.map[self.idForme]._get_point2()._get_x().__str__() + "," + self.map[self.idForme]._get_point2()._get_y().__str__())
+            self.Valeur_entry_hauteur.set(self.map[self.idForme]._get_hauteur().__str__())
+            self.Valeur_entry_largeur.set(self.map[self.idForme]._get_largeur().__str__())
         if(self.zoom > 0):
             self.Valeur_entry_zoom.set("+" + self.zoom.__str__())
         else:
@@ -318,61 +333,71 @@ class App:
     
     
     def onClicZoom(self, event):
-        print("Clic Droit")
+        print("Clic Droit " + event.x.__str__() + " ; " + event.y.__str__() )
         print ("MAP: " + self.map.__str__())
         self.ClicDroit_depart = Point(event.x, event.y)
     
     def onZoomMove(self, event):
-        print("Bouge clic Droit")
         
-        #recupere l'endroit actuel de la souris
-        self.ClicDroit_fin = Point(event.x, event.y)
-        
-        #difference entre anciennes et nouvelles coordonees (donc calcul du vecteur)
-        y_vecteur = self.ClicDroit_fin.y - self.ClicDroit_depart.y
-        coef = 0 #Aucun changement
-        print("VECTEUR=" + y_vecteur.__str__())
-        
-        print("zoom=" + self.zoom.__str__())
-        self.zoom = self.zoom +y_vecteur
-        
-        if y_vecteur < 0:
-            coef=0.9    #-10%
-        else:
-            coef=1.1    #+10%
-        
-        if coef != 0:
+        #Zoom que par deplacement vertical
+        if True:
+            print("Bouge clic2 Droit"+ event.x.__str__() + " ; " + event.y.__str__() )
+            #recupere l'endroit actuel de la souris
+            self.ClicDroit_fin = Point(event.x, event.y)
             
-            print ("MAP AVANT: " + self.map.__str__())
             
-            map_copie = deepcopy(self.map) #copie intermediaire sinon boucle infinie
-            for i in map_copie: #parcours de TOUTES LES FORMES DESSINES
-                self.cv.delete(i) #supprime l'ancienne forme du canvas
-                print("i="+i.__str__())
-                self.forme_active = self.map[i] #copie intermediaire (forme_active a associer au CANVAS )
-                del self.map[i]
-                #Agrandit/Retrecit l'objet
-                self.forme_active.zoom(coef)
+            #difference entre anciennes et nouvelles coordonees (donc calcul du vecteur)
+            y_vecteur = self.ClicDroit_fin.y - self.ClicDroit_depart.y
+            coef = 1.1 #10%
+            action = None #Zoom ou dezoom
+            print("VECTEUR=" + y_vecteur.__str__())
+            
+            print("zoom=" + self.zoom.__str__())
+            self.zoom = self.zoom +y_vecteur
+            
+            if y_vecteur < 0:
+                action = False
+            else:
+                action = True
+            
+            if action is not None:
                 
-                #----------Deplace selon l'endroit du clic pour pouvoir chosir son endroit du zoom
-                #Difference entre l'endroit du clic et le milieu de la forme
-                DistanceX = self.ClicDroit_fin._get_x() - self.forme_active._get_milieu()._get_x()
-                DistanceY = self.ClicDroit_fin._get_y() - self.forme_active._get_milieu()._get_y()
-                #Deplace selon le coef
-                self.forme_active.translation( DistanceX - DistanceX * coef, DistanceY - DistanceY * coef)
-                #Garde la forme selectionnee 
-                if i == self.idForme:
-                    self.idForme = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
-                    self.map[self.idForme] = self.forme_active
-                else:
-                    j = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
-                    self.map[j] = self.forme_active
+                print ("MAP AVANT: " + self.map.__str__())
                 
-             
-            print ("MAP APRES: " + self.map.__str__())
-            
-            self.ClicDroit_depart = self.ClicDroit_fin
-            self.majEntry()
+                map_copie = deepcopy(self.map) #copie intermediaire sinon boucle infinie
+                for i in map_copie: #parcours de TOUTES LES FORMES DESSINES
+                    self.cv.delete(i) #supprime l'ancienne forme du canvas
+                    print("i="+i.__str__())
+                    self.forme_active = self.map[i] #copie intermediaire (forme_active a associer au CANVAS )
+                    del self.map[i]
+                    #Agrandit/Retrecit l'objet
+                    if action == True :
+                        self.forme_active.zoom(coef)
+                    else:
+                        self.forme_active.dezoom(coef)
+                    
+                    #----------Deplace selon l'endroit du clic pour pouvoir chosir son endroit du zoom
+                    #Difference entre l'endroit du clic et le milieu de la forme
+                    DistanceX = self.ClicDroit_fin._get_x() - self.forme_active._get_milieu()._get_x()
+                    DistanceY = self.ClicDroit_fin._get_y() - self.forme_active._get_milieu()._get_y()
+                    #Deplace selon le coef
+                    if action == True :
+                        self.forme_active.translation( DistanceX - DistanceX * coef, DistanceY - DistanceY * coef)
+                    else:
+                        self.forme_active.translation( DistanceX - DistanceX / coef, DistanceY - DistanceY / coef)
+                    #Garde la forme selectionnee 
+                    if i == self.idForme:
+                        self.idForme = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
+                        self.map[self.idForme] = self.forme_active
+                    else:
+                        j = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
+                        self.map[j] = self.forme_active
+                    
+                 
+                print ("MAP APRES: " + self.map.__str__())
+                
+                self.ClicDroit_depart = self.ClicDroit_fin
+                self.majEntry()
         
     def clic_btn_creation(self, forme):
         self.PeutDessiner = 1
