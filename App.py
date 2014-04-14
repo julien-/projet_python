@@ -10,6 +10,7 @@ from Polygones import Polygones
 from Rectangles import Rectangles
 from Segments import Segments
 from Fabrique import Fabrique
+from FormesComposees import FormesComposees
 from copy import deepcopy
 
 from Formes import Formes;
@@ -24,6 +25,7 @@ class App(Tk):
         Tk.__init__(self)
         #Liste des formes crees
         self.map = {}
+        self.mapGroupe = {}
         self.nbFormes = 0
         
         self.tabpoints = [None]*6
@@ -101,9 +103,10 @@ class App(Tk):
         lg = Label(propriete, text ='Groupe')
         lg.grid(row=7, column=0, sticky=NSEW)
         self.Valeur_groupe    = StringVar()
-        self.comboBoxGroupe    = Combobox(propriete, textvariable = self.Valeur_groupe, state = 'readonly')
+        self.listeGroupes    = []
+        self.comboBoxGroupe    = Combobox(propriete, textvariable = self.Valeur_groupe, values = self.listeGroupes, state = 'readonly')
         self.comboBoxGroupe.grid(row=7, column=1, sticky=NSEW)
-        
+        self.comboBoxGroupe.bind('<<ComboboxSelected>>', self.onChangeCombobox)
         
         cols.append(self.comboBoxGroupe)
         cols.append(self.entry_droite_name)
@@ -113,8 +116,8 @@ class App(Tk):
         rows.append(cols)
             
         # Boutons du haut
-        self.bouton = [None]*5
-        self.photos = [None]*5
+        self.bouton = [None]*6
+        self.photos = [None]*6
         
         self.photos[0] = PhotoImage(file = 'images/cercle.png');
         self.bouton[0] = Button(toolbar, image = self.photos[0], command = lambda new_forme = Ellipses("Ellipse ", Point(0, 0) , Point(0,0) , self.color_name ):self.clic_btn_creation(new_forme))
@@ -135,6 +138,11 @@ class App(Tk):
         self.photos[4] = PhotoImage(file = 'images/triangle.png');
         self.bouton[4] = Button(toolbar, image = self.photos[4], command = lambda new_forme = Polygones("Triangle ", Point(0,0), Point(0,0), self.color_name, 3, self.tabpoints):self.clic_btn_creation(new_forme))
         self.bouton[4].pack(side =LEFT)
+        
+        self.photos[5] = PhotoImage(file = 'images/groupe.png');
+        self.bouton[5] = Button(toolbar, image = self.photos[5], command = self.clic_btn_groupe)
+        self.bouton[5].pack(side =LEFT)
+        
         # Canvas
         self.cv = Canvas(width=640, height=480, bg='black')
         #self.colorList = ["blue", "red", "green", "white", "yellow", "magenta", "orange"]
@@ -419,6 +427,40 @@ class App(Tk):
         #self.forme_active._set_nom("Forme " + self.nbFormes.__str__())
         print (Rectangles.numero.__str__())
         print(type(forme).numero.__str__()) 
+        
+    def clic_btn_groupe(self):
+
+        rows = []
+        cols = []
+        self.fenetreGroupe=Toplevel()
+        self.fenetreGroupe.resizable(False,False)
+        self.fenetreGroupe.title("Nouvelle fenetre")
+        
+        
+        labelGroupe = Label(self.fenetreGroupe, text ='Entrez le nom du groupe')
+        labelGroupe.grid(row=0, column=0, sticky=NSEW)
+        
+        entryGroupe=Entry(self.fenetreGroupe, justify='left')
+        entryGroupe.grid(row=1, column=0, sticky=NSEW)
+
+        boutonGroupe=Button(self.fenetreGroupe, text="Creer le groupe", command = lambda: self.creerGroupe(entryGroupe.get()))
+        boutonGroupe.grid(row=2, column=0)
+
+        cols.append(entryGroupe)
+        cols.append(boutonGroupe)
+        rows.append(cols)
+        
+    def creerGroupe(self, groupe):
+        self.fenetreGroupe.withdraw()
+        self.listeGroupes.append(groupe)
+        self.comboBoxGroupe.configure(values= self.listeGroupes)
+        self.mapGroupe[len(self.listeGroupes) - 1] = FormesComposees(groupe, 0, [])
+        
+    def onChangeCombobox(self, lol):
+        self.mapGroupe[self.comboBoxGroupe.current()]._ajouter_forme(self.map[self.idForme])
+        
+        print (self.mapGroupe)
+        self.mapGroupe[self.comboBoxGroupe.current()].write()
            
 if(__name__ == '__main__'):
     application = App()    # Instanciation de la classe

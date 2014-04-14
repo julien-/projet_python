@@ -23,6 +23,10 @@ class FormesComposees(Formes):
 
     nbFormes = property (_get_nbFormes, _set_nbFormes)
     
+    def _ajouter_forme(self, forme):
+        self._nbFormes = self._nbFormes + 1
+        self._listeforme.append(forme)
+        
     def write(self):
         super().write()
         print (" * Formes dans ce groupe: ")

@@ -2,6 +2,7 @@ class Formes:
     
     def __init__(self, nom):
         self._nom = nom
+        self._groupe = -1
         
     def _get_nom(self):
         return self._nom
