@@ -3,7 +3,7 @@ import time
 import os
 from tkinter import *
 from tkinter import colorchooser
-
+from tkinter.ttk    import *    # Widgets avec 
 from Ellipses import Ellipses
 from Point import Point
 from Polygones import Polygones
@@ -18,9 +18,10 @@ from dessinerEllipse import dessinerEllipse;
 from dessinerSegment import dessinerSegment;
 from dessinerPolygone import dessinerPolygone;
 
-class App:
+class App(Tk):
     
-    def __init__(self, root):
+    def __init__(self):
+        Tk.__init__(self)
         #Liste des formes crees
         self.map = {}
         self.nbFormes = 0
@@ -31,7 +32,7 @@ class App:
         self.j = 0
         
         # Fenetre
-        self.root = root
+        self.root = self
         self.root.title("Formes")
         
         formes = [dessinerRectangle, dessinerEllipse, dessinerSegment, dessinerPolygone]
@@ -40,9 +41,9 @@ class App:
             self.fabrique.ajouter_forme(forme)
             
         # Barre d'outils
-        toolbar = Frame(root)
+        toolbar = Frame(self.root)
         toolbar.pack(expand =YES, fill =X, side =TOP)
-        propriete = Frame(root)
+        propriete = Frame(self.root)
         propriete.pack(expand =YES, fill =X, side =RIGHT)
         self.color_name = 'white'
         rows = []
@@ -52,51 +53,59 @@ class App:
         self.zoom = 0;
         
         # Labels a droite
-        ln = Label(propriete, relief=RIDGE, text ='Nom')
+        ln = Label(propriete, text ='Nom')
         ln.grid(row=0, column=0, sticky=NSEW)
         self.Valeur_entry_nom = StringVar()
-        self.entry_droite_name = Entry(propriete, relief=RIDGE, textvariable = self.Valeur_entry_nom)
+        self.entry_droite_name = Entry(propriete, textvariable = self.Valeur_entry_nom)
         self.entry_droite_name.grid(row=0, column=1, sticky=NSEW)
         
-        lc = Label(propriete, relief=RIDGE, text ='Couleur de la forme')
+        lc = Label(propriete, text ='Couleur de la forme')
         lc.grid(row=1, column=0, sticky=NSEW)
-        self.label_droite_couleur = Label(propriete, relief=RIDGE)
+        self.label_droite_couleur = Label(propriete)
         self.label_droite_couleur.grid(row=1, column=1, sticky=NSEW)
         
         
-        lp1 = Label(propriete, relief=RIDGE, text ='Point1 (X,Y)')
+        lp1 = Label(propriete, text ='Point1 (X,Y)')
         lp1.grid(row=2, column=0, sticky=NSEW)
         self.Valeur_entry_point1 = StringVar()
-        self.entry_droite_point1 = Entry(propriete, relief=RIDGE, textvariable = self.Valeur_entry_point1)
+        self.entry_droite_point1 = Entry(propriete, textvariable = self.Valeur_entry_point1)
         self.entry_droite_point1.grid(row=2, column=1, sticky=NSEW)
         
         
-        lp2 = Label(propriete, relief=RIDGE, text ='Point2 (X,Y)')
+        lp2 = Label(propriete, text ='Point2 (X,Y)')
         lp2.grid(row=3, column=0, sticky=NSEW)
         self.Valeur_entry_point2 = StringVar()
-        self.entry_droite_point2 = Entry(propriete, relief=RIDGE, textvariable = self.Valeur_entry_point2)
+        self.entry_droite_point2 = Entry(propriete, textvariable = self.Valeur_entry_point2)
         self.entry_droite_point2.grid(row=3, column=1, sticky=NSEW)
         
-        lhauteur = Label(propriete, relief=RIDGE, text ='Hauteur')
+        lhauteur = Label(propriete, text ='Hauteur')
         lhauteur.grid(row=4, column=0, sticky=NSEW)
         self.Valeur_entry_hauteur = StringVar()
-        self.entry_droite_hauteur = Entry(propriete, relief=RIDGE, textvariable = self.Valeur_entry_hauteur)
+        self.entry_droite_hauteur = Entry(propriete, textvariable = self.Valeur_entry_hauteur)
         self.entry_droite_hauteur.grid(row=4, column=1, sticky=NSEW)
         
-        llargeur = Label(propriete, relief=RIDGE, text ='Largeur')
+        llargeur = Label(propriete, text ='Largeur')
         llargeur.grid(row=5, column=0, sticky=NSEW)
         self.Valeur_entry_largeur = StringVar()
-        self.entry_droite_largeur = Entry(propriete, relief=RIDGE, textvariable = self.Valeur_entry_largeur)
+        self.entry_droite_largeur = Entry(propriete, textvariable = self.Valeur_entry_largeur)
         self.entry_droite_largeur.grid(row=5, column=1, sticky=NSEW)
         
         
-        lz = Label(propriete, relief=RIDGE, text ='Zoom')
+        lz = Label(propriete, text ='Zoom')
         lz.grid(row=6, column=0, sticky=NSEW)
         self.Valeur_entry_zoom = StringVar()
         self.Valeur_entry_zoom.set( self.zoom.__str__())
-        self.entry_droite_zoom = Entry(propriete, relief=RIDGE, textvariable = self.Valeur_entry_zoom)
+        self.entry_droite_zoom = Entry(propriete, textvariable = self.Valeur_entry_zoom)
         self.entry_droite_zoom.grid(row=6, column=1, sticky=NSEW)
         
+        lg = Label(propriete, text ='Groupe')
+        lg.grid(row=7, column=0, sticky=NSEW)
+        self.Valeur_groupe    = StringVar()
+        self.comboBoxGroupe    = Combobox(propriete, textvariable = self.Valeur_groupe, state = 'readonly')
+        self.comboBoxGroupe.grid(row=7, column=1, sticky=NSEW)
+        
+        
+        cols.append(self.comboBoxGroupe)
         cols.append(self.entry_droite_name)
         cols.append(self.label_droite_couleur)
         cols.append(self.entry_droite_point1)
@@ -108,23 +117,23 @@ class App:
         self.photos = [None]*5
         
         self.photos[0] = PhotoImage(file = 'images/cercle.png');
-        self.bouton[0] = Button(toolbar, image = self.photos[0], relief =GROOVE, command = lambda new_forme = Ellipses("Ellipse ", Point(0, 0) , Point(0,0) , self.color_name ):self.clic_btn_creation(new_forme))
+        self.bouton[0] = Button(toolbar, image = self.photos[0], command = lambda new_forme = Ellipses("Ellipse ", Point(0, 0) , Point(0,0) , self.color_name ):self.clic_btn_creation(new_forme))
         self.bouton[0].pack(side =LEFT)
         
         self.photos[1] = PhotoImage(file = 'images/rectangle.png');
-        self.bouton[1] = Button(toolbar, image = self.photos[1], relief =GROOVE, command = lambda new_forme = Rectangles("Rectangle ",Point(0,0), Point(0, 0), self.color_name) :self.clic_btn_creation(new_forme))
+        self.bouton[1] = Button(toolbar, image = self.photos[1], command = lambda new_forme = Rectangles("Rectangle ",Point(0,0), Point(0, 0), self.color_name) :self.clic_btn_creation(new_forme))
         self.bouton[1].pack(side =LEFT)
         
         self.photos[2] = PhotoImage(file = 'images/polygone.png');
-        self.bouton[2] = Button(toolbar, image = self.photos[2], relief =GROOVE, command = lambda new_forme = Polygones("Polygone ", Point(0,0), Point(0,0), self.color_name, 5, self.tabpoints):self.clic_btn_creation(new_forme))
+        self.bouton[2] = Button(toolbar, image = self.photos[2], command = lambda new_forme = Polygones("Polygone ", Point(0,0), Point(0,0), self.color_name, 5, self.tabpoints):self.clic_btn_creation(new_forme))
         self.bouton[2].pack(side =LEFT)
 
         self.photos[3] = PhotoImage(file = 'images/segment.png');
-        self.bouton[3] = Button(toolbar, image = self.photos[3], relief =GROOVE, command = lambda new_forme = Segments("Segment ", Point(0, 0), Point(0,0), self.color_name):self.clic_btn_creation(new_forme))
+        self.bouton[3] = Button(toolbar, image = self.photos[3], command = lambda new_forme = Segments("Segment ", Point(0, 0), Point(0,0), self.color_name):self.clic_btn_creation(new_forme))
         self.bouton[3].pack(side =LEFT)
         
         self.photos[4] = PhotoImage(file = 'images/triangle.png');
-        self.bouton[4] = Button(toolbar, image = self.photos[4], relief =GROOVE, command = lambda new_forme = Polygones("Triangle ", Point(0,0), Point(0,0), self.color_name, 3, self.tabpoints):self.clic_btn_creation(new_forme))
+        self.bouton[4] = Button(toolbar, image = self.photos[4], command = lambda new_forme = Polygones("Triangle ", Point(0,0), Point(0,0), self.color_name, 3, self.tabpoints):self.clic_btn_creation(new_forme))
         self.bouton[4].pack(side =LEFT)
         # Canvas
         self.cv = Canvas(width=640, height=480, bg='black')
@@ -411,7 +420,7 @@ class App:
         print (Rectangles.numero.__str__())
         print(type(forme).numero.__str__()) 
            
-root = Tk()
-app = App(root)
-root.mainloop()
-
+if(__name__ == '__main__'):
+    application = App()    # Instanciation de la classe
+    application.mainloop()        # Boucle pour garder le programme en vie
+    application.quit()    
