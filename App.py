@@ -103,11 +103,11 @@ class App(Tk):
         lg = Label(propriete, text ='Groupe')
         lg.grid(row=7, column=0, sticky=NSEW)
         self.Valeur_groupe    = StringVar()
-        self.listeGroupes    = []
+        self.listeGroupes    = ['']
         self.comboBoxGroupe    = Combobox(propriete, textvariable = self.Valeur_groupe, values = self.listeGroupes, state = 'readonly')
         self.comboBoxGroupe.grid(row=7, column=1, sticky=NSEW)
         self.comboBoxGroupe.bind('<<ComboboxSelected>>', self.onChangeCombobox)
-        
+        self.comboBoxGroupe.current(0)
         cols.append(self.comboBoxGroupe)
         cols.append(self.entry_droite_name)
         cols.append(self.label_droite_couleur)
@@ -271,6 +271,10 @@ class App(Tk):
             self.Valeur_entry_point2.set(self.map[self.idForme]._get_point2()._get_x().__str__() + "," + self.map[self.idForme]._get_point2()._get_y().__str__())
             self.Valeur_entry_hauteur.set(self.map[self.idForme]._get_hauteur().__str__())
             self.Valeur_entry_largeur.set(self.map[self.idForme]._get_largeur().__str__())
+            if (self.map[self.idForme]._groupe != -1):
+                self.comboBoxGroupe.current(self.map[self.idForme]._groupe)
+            else:
+                self.comboBoxGroupe.current(0)    
         if(self.zoom > 0):
             self.Valeur_entry_zoom.set("+" + self.zoom.__str__())
         else:
@@ -477,10 +481,11 @@ class App(Tk):
         self.mapGroupe[len(self.listeGroupes) - 1] = FormesComposees(groupe, 0, [])
         
     def onChangeCombobox(self, lol):
-        self.mapGroupe[self.comboBoxGroupe.current()]._ajouter_forme(self.map[self.idForme])
-        
-        print (self.mapGroupe)
-        self.mapGroupe[self.comboBoxGroupe.current()].write()
+        if (self.comboBoxGroupe.current() != 0):
+            self.mapGroupe[self.comboBoxGroupe.current()]._ajouter_forme(self.map[self.idForme])
+            self.map[self.idForme]._groupe = self.comboBoxGroupe.current()
+            print (self.mapGroupe)
+            self.mapGroupe[self.comboBoxGroupe.current()].write()
            
 if(__name__ == '__main__'):
     application = App()    # Instanciation de la classe
