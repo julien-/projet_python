@@ -28,8 +28,8 @@ class App(Tk):
         self.mapGroupe = {}
         self.nbFormes = 0
         
-        self.tabpoints = [None]*6
-        self.TabPoint = [None]*5
+        self.tabpoints = [None]*2
+        
         self.i = 0
         self.j = 0
         
@@ -126,18 +126,20 @@ class App(Tk):
         self.photos[1] = PhotoImage(file = 'images/rectangle.png');
         self.bouton[1] = Button(toolbar, image = self.photos[1], command = lambda new_forme = Rectangles("Rectangle ",Point(0,0), Point(0, 0), self.color_name) :self.clic_btn_creation(new_forme))
         self.bouton[1].pack(side =LEFT)
-        
-        self.photos[2] = PhotoImage(file = 'images/polygone.png');
-        self.bouton[2] = Button(toolbar, image = self.photos[2], command = lambda new_forme = Polygones("Polygone ", Point(0,0), Point(0,0), self.color_name, 5, self.tabpoints):self.clic_btn_creation(new_forme))
-        self.bouton[2].pack(side =LEFT)
 
-        self.photos[3] = PhotoImage(file = 'images/segment.png');
-        self.bouton[3] = Button(toolbar, image = self.photos[3], command = lambda new_forme = Segments("Segment ", Point(0, 0), Point(0,0), self.color_name):self.clic_btn_creation(new_forme))
+        self.photos[2] = PhotoImage(file = 'images/segment.png');
+        self.bouton[2] = Button(toolbar, image = self.photos[2], command = lambda new_forme = Segments("Segment ", Point(0, 0), Point(0,0), self.color_name):self.clic_btn_creation(new_forme))
+        self.bouton[2].pack(side =LEFT)
+        
+        self.photos[3] = PhotoImage(file = 'images/triangle.png');
+        self.bouton[3] = Button(toolbar, image = self.photos[3], command = lambda new_forme = Polygones("Triangle ", Point(0,0), Point(0,0), self.color_name, 3, self.tabpoints):self.clic_btn_creation(new_forme))
         self.bouton[3].pack(side =LEFT)
         
-        self.photos[4] = PhotoImage(file = 'images/triangle.png');
-        self.bouton[4] = Button(toolbar, image = self.photos[4], command = lambda new_forme = Polygones("Triangle ", Point(0,0), Point(0,0), self.color_name, 3, self.tabpoints):self.clic_btn_creation(new_forme))
+        self.photos[4] = PhotoImage(file = 'images/polygone.png');
+        self.bouton[4] = Button(toolbar, image = self.photos[4])
         self.bouton[4].pack(side =LEFT)
+        
+        self.bouton[4].bind("<ButtonPress-1>", lambda event, arg = toolbar:self.DefNombrePointsPolygone(event, arg))
         
         self.photos[5] = PhotoImage(file = 'images/groupe.png');
         self.bouton[5] = Button(toolbar, image = self.photos[5], command = self.clic_btn_groupe)
@@ -161,6 +163,21 @@ class App(Tk):
         self.label_droite_couleur.bind('<ButtonPress-1>', self.changerCouleur)
         self.root.bind('<Delete>', self.supprimerForme)
         self.cv.pack()
+        
+    def DefNombrePointsPolygone(self, event, toolbar):
+        self.data = IntVar()
+        self.entry_nbpts_poly = Entry(toolbar, textvariable = self.data)
+        self.entry_nbpts_poly.pack(side = RIGHT)
+        self.labelnb = Label(toolbar, text="Nombre de points: ")
+        self.labelnb.pack(side = RIGHT)
+        self.entry_nbpts_poly.bind('<Return>',self.NewPoly)
+        
+    def NewPoly(self, event):
+        self.tabpoints = [None]*(2*(self.data.get()-2))
+        new_forme = Polygones("Polygone ", Point(0,0), Point(0,0), self.color_name, self.data.get(), self.tabpoints)
+        self.entry_nbpts_poly.destroy()
+        self.labelnb.destroy()
+        self.clic_btn_creation(new_forme)
                
     def changerCouleur(self, event):
 
@@ -174,16 +191,15 @@ class App(Tk):
         print("Changement de couleur entry_droite_name : ",self.color_name)
         
     def onMouseMolette(self, event):
-        self.TabPoint[self.i] = Point(event.x, event.y)
+        self.coordPoint = Point(event.x, event.y)
         if(self.i == self.forme_active._get_nbpoints()-1):
-            if(self.forme_active._get_nbpoints() == 3):
-                self.tabpoints[0]=(self.TabPoint[self.i].x)
-                self.tabpoints[1]=(self.TabPoint[self.i].y)
-            else:
-                self.tabpoints[self.forme_active._get_nbpoints()-1]=(self.TabPoint[self.i].x)
-                self.tabpoints[self.forme_active._get_nbpoints()]=(self.TabPoint[self.i].y)
+                
+            self.tabpoints[len(self.tabpoints)-2]=(self.coordPoint.x)
+            self.tabpoints[len(self.tabpoints)-1]=(self.coordPoint.y)
+                
             print(self.tabpoints)
-            self.forme_active.maj(Point(self.TabPoint[0].x, self.TabPoint[0].y), Point(self.TabPoint[1].x,self.TabPoint[1].y), self.forme_active._get_nbpoints(), self.tabpoints)
+            
+            self.forme_active.maj(Point(self.coordpoint1.x, self.coordpoint1.y), Point(self.coordpoint2.x, self.coordpoint2.y), self.forme_active._get_nbpoints(), self.tabpoints)
             self.forme_active.write()
             self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
             self.map[self.idForme] = self.forme_active
@@ -191,9 +207,13 @@ class App(Tk):
             self.i = 0
             self.j = 0
         else:
+            if(self.i == 0):
+                self.coordpoint1 = self.coordPoint
+            if(self.i == 1):
+                self.coordpoint2 = self.coordPoint
             if(self.i >1):
-                self.tabpoints[self.j]=(self.TabPoint[self.i].x)
-                self.tabpoints[self.j+1]=(self.TabPoint[self.i].y)
+                self.tabpoints[self.j]=(self.coordPoint.x)
+                self.tabpoints[self.j+1]=(self.coordPoint.y)
                 self.j = self.j+2
             self.i = self.i+1
     
