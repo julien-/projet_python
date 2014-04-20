@@ -5,8 +5,8 @@ class FormesComposees(Formes):
     def __init__(self, nom, nbFormes, listeforme):
         super(FormesComposees,self).__init__(nom)
         self._listeforme = listeforme
-        self._nbFormes = nbFormes 
-        
+        self._nbFormes = nbFormes   
+    
     def _get_listeforme(self):
         return self._listeforme
 
@@ -26,10 +26,17 @@ class FormesComposees(Formes):
     def _ajouter_forme(self, forme):
         self._nbFormes = self._nbFormes + 1
         self._listeforme.append(forme)
+    
+    def _presence_forme(self, forme):    
+        for i in range (self._nbFormes):
+            if(self._listeforme[i]._get_id() == forme._get_id()):
+                return 1
+        return 0
         
     def write(self):
         super().write()
         print (" * Formes dans ce groupe: ")
         i = 0
         for i in range (self._nbFormes):
-            self._listeforme[i].write()
+            print(self._listeforme[i]._get_nom())
+    

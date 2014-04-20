@@ -3,12 +3,20 @@ from Point import Point
 
 class FormesSimples(Formes):
 
-    def __init__(self, nom, point1, point2, couleur):
+    def __init__(self, nom, id, point1, point2, couleur):
         super(FormesSimples,self).__init__(nom)
+        self.id = id
         self._point1 = point1
         self._point2 = point2
         self._couleur = couleur  
  
+    #_id
+    def _get_id(self):
+        return self._id
+
+    def _set_id(self, id):
+        self._id = id
+    
     #_couleur    
     def _get_couleur(self):
         return self._couleur
@@ -32,6 +40,7 @@ class FormesSimples(Formes):
         self._point2._set_x(point._get_x());
         self._point2._set_y(point._get_y());
     
+    id = property (_get_id, _set_id)
     couleur = property (_get_couleur, _set_couleur)
     point1 = property (_get_point1, _set_point1)
     point2 = property (_get_point2, _set_point2)
