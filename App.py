@@ -222,13 +222,13 @@ class App(Tk):
         #Si on selectionne une formes
         if len(items):
             del self.map[self.idForme]
-            self.cv.delete(root,self.idForme)
+            self.cv.delete(self.root,self.idForme)
 
             self.root.update()
         
 
     def regenererForme(self):
-        self.cv.delete(root, self.idForme)
+        self.cv.delete(self.root, self.idForme)
         self.forme_active.write()
         newIdForme = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
         self.map[newIdForme] = deepcopy(self.map[self.idForme])
