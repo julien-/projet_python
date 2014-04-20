@@ -223,7 +223,8 @@ class App(Tk):
         if len(items):
             del self.map[self.idForme]
             self.cv.delete(self.root,self.idForme)
-
+            self.idForme = None
+            self.majEntry()
             self.root.update()
         
 
@@ -238,7 +239,7 @@ class App(Tk):
         self.map[self.idForme]._set_nom(self.entry_droite_name.get())
         self.forme_active = self.map[self.idForme]
         self.root.update()
-        
+
 
     def modifByEdit(self, event):
         #active les ENTRY si une forme est selectionne
@@ -275,6 +276,14 @@ class App(Tk):
                 self.comboBoxGroupe.current(self.map[self.idForme]._groupe)
             else:
                 self.comboBoxGroupe.current(0)    
+        else:
+            self.Valeur_entry_nom.set('')
+            self.label_droite_couleur.configure(background='')
+            self.Valeur_entry_point1.set('')
+            self.Valeur_entry_point2.set('')
+            self.Valeur_entry_hauteur.set('')
+            self.Valeur_entry_largeur.set('')
+            self.comboBoxGroupe.current(0) 
         if(self.zoom > 0):
             self.Valeur_entry_zoom.set("+" + self.zoom.__str__())
         else:
