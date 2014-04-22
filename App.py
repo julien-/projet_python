@@ -585,12 +585,16 @@ class App(Tk):
     def onChangeCombobox(self, lol):
         if (self.comboBoxGroupe.current() != 0):
             if(self.map[self.idForme]._groupe != -1):            
-                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)        
+                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)
+                self.map[self.idForme]._groupe = -1        
             self.mapGroupe[self.comboBoxGroupe.current()]._ajouter_forme(self.idForme)
             self.map[self.idForme]._groupe = self.comboBoxGroupe.current()
             print ("MAPGROUPE= "+self.mapGroupe.__str__())
-            #self.mapGroupe[self.comboBoxGroupe.current()].write()
-    
+        else:
+            if(self.map[self.idForme]._groupe != -1):
+                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)
+                self.map[self.idForme]._groupe = -1 
+                
     def selectionGroupe(self, event):
         print("==================SelectionneTouteFormeDuGroupe============")
         
