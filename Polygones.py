@@ -3,8 +3,8 @@ from FormesSimples import FormesSimples
 class Polygones(FormesSimples):
  
     numero = 0
-    def __init__(self, nom, id, point1, point2, couleur, nbpoints, tabpoints):
-        super(Polygones,self).__init__(nom, id, point1, point2, couleur)
+    def __init__(self, nom, point1, point2, couleur, nbpoints, tabpoints):
+        super(Polygones,self).__init__(nom, point1, point2, couleur)
         self._nbpoints = nbpoints
         self._tabpoints = tabpoints
 

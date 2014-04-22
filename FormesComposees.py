@@ -5,8 +5,8 @@ class FormesComposees(Formes):
     def __init__(self, nom, nbFormes, listeforme):
         super(FormesComposees,self).__init__(nom)
         self._listeforme = listeforme
-        self._nbFormes = nbFormes   
-    
+        self._nbFormes = nbFormes 
+        
     def _get_listeforme(self):
         return self._listeforme
 
@@ -15,30 +15,17 @@ class FormesComposees(Formes):
 
     listeforme = property (_get_listeforme, _set_listeforme)
     
-    def _get_nbFormes(self):
-        return self._nbFormes
-
-    def _set_nbFormes(self, nbFormes):
-        self._nbFormes = nbFormes
-
-    nbFormes = property (_get_nbFormes, _set_nbFormes)
+    def _ajouter_forme(self, idforme):
+        self._listeforme[idforme] = 1
     
-    def _ajouter_forme(self, forme):
-        self._nbFormes = self._nbFormes + 1
-        self._listeforme.append(forme)
-    
-    def _supprimer_forme(self, forme):    
-        #for i in range (self._nbFormes):
-            #if(self._listeforme[i]._get_id() == forme._get_id()):
-                #self._listeforme.remove(self._listeforme[i])
-        #print("Liste Formes"+str(self._listeforme))
-        self._nbFormes = self._nbFormes - 1
-        self._listeforme.remove(forme)
+    def translation(self, x, y):
+        super().translation()
+        print ("--- TRANSLATION GROUPE ---")
+        for i in self._listeforme:
+            self._listeforme[i].translation(x, y)
         
     def write(self):
         super().write()
         print (" * Formes dans ce groupe: ")
-        i = 0
-        for i in range (self._nbFormes):
-            print(self._listeforme[i]._get_nom())
-    
+        for i in self._listeforme:
+            self._listeforme[i].write()

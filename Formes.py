@@ -19,3 +19,5 @@ class Formes:
     def translation(self): pass
     
     def zoom(self): pass
+    
+    def selectionner(self, canvas, id): pass
