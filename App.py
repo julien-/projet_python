@@ -227,6 +227,7 @@ class App(Tk):
             self.majEntry()
             self.i = 0
             self.j = 0
+            self.tabpoints = [None]*2
         else:
             if(self.i == 0):
                 self.coordpoint1 = self.coordPoint
