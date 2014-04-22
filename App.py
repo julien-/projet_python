@@ -51,6 +51,7 @@ class App(Tk):
         rows = []
         cols = []
         self.forme_active = None
+        self.groupe_actif = None
         self.idForme = None
         self.zoom = 0;
         
@@ -120,19 +121,19 @@ class App(Tk):
         self.photos = [None]*6
         
         self.photos[0] = PhotoImage(file = 'images/cercle.png');
-        self.bouton[0] = Button(toolbar, image = self.photos[0], command = lambda new_forme = Ellipses("Ellipse ", 0, Point(0, 0) , Point(0,0) , self.color_name ):self.clic_btn_creation(new_forme))
+        self.bouton[0] = Button(toolbar, image = self.photos[0], command = lambda new_forme = Ellipses("Ellipse ", None, Point(0, 0) , Point(0,0) , self.color_name ):self.clic_btn_creation(new_forme))
         self.bouton[0].pack(side =LEFT)
         
         self.photos[1] = PhotoImage(file = 'images/rectangle.png');
-        self.bouton[1] = Button(toolbar, image = self.photos[1], command = lambda new_forme = Rectangles("Rectangle ", 0, Point(0,0), Point(0, 0), self.color_name) :self.clic_btn_creation(new_forme))
+        self.bouton[1] = Button(toolbar, image = self.photos[1], command = lambda new_forme = Rectangles("Rectangle ", None, Point(0,0), Point(0, 0), self.color_name) :self.clic_btn_creation(new_forme))
         self.bouton[1].pack(side =LEFT)
 
         self.photos[2] = PhotoImage(file = 'images/segment.png');
-        self.bouton[2] = Button(toolbar, image = self.photos[2], command = lambda new_forme = Segments("Segment ", 0, Point(0, 0), Point(0,0), self.color_name):self.clic_btn_creation(new_forme))
+        self.bouton[2] = Button(toolbar, image = self.photos[2], command = lambda new_forme = Segments("Segment ", None, Point(0, 0), Point(0,0), self.color_name):self.clic_btn_creation(new_forme))
         self.bouton[2].pack(side =LEFT)
         
         self.photos[3] = PhotoImage(file = 'images/triangle.png');
-        self.bouton[3] = Button(toolbar, image = self.photos[3], command = lambda new_forme = Polygones("Triangle ", 0, Point(0,0), Point(0,0), self.color_name, 3, self.tabpoints):self.clic_btn_creation(new_forme))
+        self.bouton[3] = Button(toolbar, image = self.photos[3], command = lambda new_forme = Polygones("Triangle ", None, Point(0,0), Point(0,0), self.color_name, 3, self.tabpoints):self.clic_btn_creation(new_forme))
         self.bouton[3].pack(side =LEFT)
         
         self.photos[4] = PhotoImage(file = 'images/polygone.png');
@@ -174,7 +175,7 @@ class App(Tk):
         
     def NewPoly(self, event):
         self.tabpoints = [None]*(2*(self.data.get()-2))
-        new_forme = Polygones("Polygone ", 0, Point(0,0), Point(0,0), self.color_name, self.data.get(), self.tabpoints)
+        new_forme = Polygones("Polygone ", None, Point(0,0), Point(0,0), self.color_name, self.data.get(), self.tabpoints)
         self.entry_nbpts_poly.destroy()
         self.labelnb.destroy()
         self.clic_btn_creation(new_forme)
@@ -202,7 +203,6 @@ class App(Tk):
             self.forme_active.maj(Point(self.coordpoint1.x, self.coordpoint1.y), Point(self.coordpoint2.x, self.coordpoint2.y), self.forme_active._get_nbpoints(), self.tabpoints)
             self.forme_active.write()
             self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
-            self.forme_active._set_id(self.idForme)
             self.map[self.idForme] = self.forme_active
             self.majEntry()
             self.i = 0
@@ -237,7 +237,6 @@ class App(Tk):
         del self.map[self.idForme]
         print ("regeneration" + self.idForme.__str__())
         self.idForme = newIdForme
-        #self.forme_active._set_id(self.idForme)
         self.map[self.idForme]._set_nom(self.entry_droite_name.get())
         self.forme_active = self.map[self.idForme]
         self.root.update()
@@ -346,9 +345,11 @@ class App(Tk):
             if (((self.map[self.idForme])._get_point1()._get_x() + x_vecteur) >= 0) and (((self.map[self.idForme])._get_point2()._get_x() + x_vecteur) <= self.cv.winfo_width() and (((self.map[self.idForme])._get_point1()._get_y() + y_vecteur) >= 0) and (((self.map[self.idForme])._get_point2()._get_y() + y_vecteur) <= self.cv.winfo_height())):
                 print ("entre  a " + ((self.map[self.idForme])._get_point1()._get_x() + x_vecteur).__str__())
                 #MAJ Canvas
-
-                self.MoveGroupe(self.mapGroupe[self.comboBoxGroupe.current()], x_vecteur, y_vecteur)
-                #self.cv.move(self.idForme, x_vecteur, y_vecteur)
+                
+                if(self.forme_active._get_id() is not None):
+                    self.MoveGroupe(self.mapGroupe[self.comboBoxGroupe.current()], x_vecteur, y_vecteur)
+                else:
+                    self.cv.move(self.idForme, x_vecteur, y_vecteur)
                     
                 print ("MAPmoove: " + self.map.__str__())
                 print ("IDmoove: " + self.idForme.__str__())
@@ -382,7 +383,6 @@ class App(Tk):
                     self.forme_active.maj(self.forme_active._get_point1(), self.forme_active._get_point2())
                     self.forme_active.write()
                     self.idForme =self.fabrique.fabriquer_forme(self.forme_active, self.cv)
-                    self.forme_active._set_id(self.idForme)
                     self.map[self.idForme] = self.forme_active
                     
                     self.majEntry()
@@ -445,7 +445,6 @@ class App(Tk):
                     #Garde la forme selectionnee 
                     if i == self.idForme:
                         self.idForme = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
-                        self.forme_active._set_id(self.idForme)
                         self.map[self.idForme] = self.forme_active
                     else:
                         j = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
@@ -500,11 +499,18 @@ class App(Tk):
         
     def onChangeCombobox(self, lol):
         if (self.comboBoxGroupe.current() != 0):
-            self.mapGroupe[self.comboBoxGroupe.current()]._ajouter_forme(self.map[self.idForme])
-            self.map[self.idForme]._groupe = self.comboBoxGroupe.current()
-            print (self.mapGroupe)
-            self.mapGroupe[self.comboBoxGroupe.current()].write()
-            
+            if(self.forme_active._get_id() is not None):            
+                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.forme_active)        
+            self.idGroupe = self.comboBoxGroupe.current()
+            self.mapGroupe[self.idGroupe]._ajouter_forme(self.forme_active)
+            self.forme_active._set_id(self.idForme)
+            self.map[self.idForme]._groupe = self.idGroupe
+            self.mapGroupe[self.idGroupe].write()
+        else:
+            if(self.forme_active._get_id() is not None):
+                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.forme_active)
+                self.forme_active._set_id(None)      
+
     def MoveGroupe(self, groupe, x, y):
         i = 0
         for i in range (groupe._get_nbFormes()):

@@ -27,11 +27,13 @@ class FormesComposees(Formes):
         self._nbFormes = self._nbFormes + 1
         self._listeforme.append(forme)
     
-    def _presence_forme(self, forme):    
-        for i in range (self._nbFormes):
-            if(self._listeforme[i]._get_id() == forme._get_id()):
-                return 1
-        return 0
+    def _supprimer_forme(self, forme):    
+        #for i in range (self._nbFormes):
+            #if(self._listeforme[i]._get_id() == forme._get_id()):
+                #self._listeforme.remove(self._listeforme[i])
+        #print("Liste Formes"+str(self._listeforme))
+        self._nbFormes = self._nbFormes - 1
+        self._listeforme.remove(forme)
         
     def write(self):
         super().write()
