@@ -243,6 +243,8 @@ class App(Tk):
         items = self.cv.find_withtag('current')
         #Si on selectionne une formes
         if len(items):
+            if(self.map[self.idForme]._groupe != -1):            
+                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)        
             del self.map[self.idForme]
             self.cv.delete(self.root,self.idForme)
             self.idForme = None
