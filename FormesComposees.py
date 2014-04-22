@@ -17,6 +17,9 @@ class FormesComposees(Formes):
     
     def _ajouter_forme(self, idforme):
         self._listeforme[idforme] = 1
+        
+    def _supprimer_forme(self, idforme):    
+        del self._listeforme[idforme]
     
     def translation(self, x, y):
         super().translation()
