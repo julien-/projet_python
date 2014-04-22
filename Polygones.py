@@ -41,10 +41,10 @@ class Polygones(FormesSimples):
             
     def translation(self, x, y):
         super().translation(x, y)
-        
-        #i = 0
-        #while (i < len(self._tabpoints)-1):
-            #self._tabpoints[i] = self.tabpoints[i] + x
-            #self._tabpoints[i+1] = self.tabpoints[i] + y
-            #i = i+2
+
+        i = 0
+        while (i < len(self._tabpoints)-1):
+            self._tabpoints[i] = self.tabpoints[i] + x
+            self._tabpoints[i+1] = self.tabpoints[i+1] + y
+            i = i+2
         
