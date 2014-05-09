@@ -52,7 +52,7 @@ class App(Tk):
         cols = []
         self.forme_active = None
         self.idForme = None
-        self.zoom = 0;
+        self.zoom = 1.1;
         
         # Labels a droite
         ln = Label(propriete, text ='Nom')
@@ -115,7 +115,9 @@ class App(Tk):
         lgroupeactif = Label(propriete, textvariable = self.Valeur_labelgroupeactif) #valeur definie par Valeur_groupeactif
         lgroupeactif.grid(row=8, column=1, sticky=NSEW)
         
-         
+
+        
+        
         cols.append(self.comboBoxGroupe)
         cols.append(self.entry_droite_name)
         cols.append(self.label_droite_couleur)
@@ -172,6 +174,7 @@ class App(Tk):
         self.label_droite_couleur.bind('<ButtonPress-1>', self.changerCouleur)
         self.root.bind('<Delete>', self.supprimerForme)
         self.cv.pack()
+
         
     def DefNombrePointsPolygone(self, event, toolbar):
         self.data = IntVar()
@@ -467,40 +470,40 @@ class App(Tk):
         print("Clic Droit " + event.x.__str__() + " ; " + event.y.__str__() )
         print ("MAP: " + self.map.__str__())
         self.ClicDroit_depart = Point(event.x, event.y)
+        
+
     
     def onZoomMove(self, event):
-        
-        #Zoom que par deplacement vertical
-        if True:
-            print("===============Bouge clic2 Droit================="+ event.x.__str__() + " ; " + event.y.__str__() )
-            #recupere l'endroit actuel de la souris
-            self.ClicDroit_fin = Point(event.x, event.y)
-            
-            
-            #difference entre anciennes et nouvelles coordonees (donc calcul du vecteur)
-            y_vecteur = self.ClicDroit_fin.y - self.ClicDroit_depart.y
-            action = None #Zoom ou dezoom
-            
-            if y_vecteur < 0:
-                action = False
+        if self.idForme is not None:
+            #Zoom que par deplacement vertical
+            if True:
+                print("===============Bouge clic2 Droit================="+ event.x.__str__() + " ; " + event.y.__str__() )
+                #recupere l'endroit actuel de la souris
+                self.ClicDroit_fin = Point(event.x, event.y)
                 
-            if y_vecteur > 0:
-                action = True
-            
-            coef = 1.1 #10%
-            
-            print("VECTEUR=" + y_vecteur.__str__())
-            
-            print("zoom=" + self.zoom.__str__())
-            self.zoom = self.zoom +y_vecteur
-            
-            
-            if action is not None:
                 
-                print ("MAP AVANT: " + self.map.__str__())
+                #difference entre anciennes et nouvelles coordonees (donc calcul du vecteur)
+                y_vecteur = self.ClicDroit_fin.y - self.ClicDroit_depart.y
+                action = None #Zoom ou dezoom
                 
-                map_copie = deepcopy(self.map) #copie intermediaire sinon boucle infinie
-                for i in map_copie: #parcours de TOUTES LES FORMES DESSINES
+                if y_vecteur < 0:
+                    action = False
+                    
+                if y_vecteur > 0:
+                    action = True
+                
+                coef = 1.1 #10%
+                
+                print("VECTEUR=" + y_vecteur.__str__())
+                
+                print("zoom=" + self.zoom.__str__())
+                self.zoom = self.zoom +y_vecteur
+                
+                
+                if action is not None:
+                    
+                    print ("MAP AVANT: " + self.map.__str__())
+                    i = self.idForme
                     self.cv.delete(i) #supprime l'ancienne forme du canvas
                     print("i="+i.__str__())
                     self.forme_active = self.map[i] #copie intermediaire (forme_active a associer au CANVAS )
@@ -529,18 +532,17 @@ class App(Tk):
                         j = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
                         self.map[j] = self.forme_active
                         r = j
-                    
-                    #===========================================================
-                    # MAJ de la mapGroupe car les id de map ont change mais pas ceux de mapgroupe
-                    #===========================================================
-                    self.majMapGroupe(i, r)
-                 
-                print ("MAP APRES: " + self.map.__str__())
-                print ("MAPGRP APRES: " + self.mapGroupe.__str__())
-                
-                self.ClicDroit_depart = self.ClicDroit_fin
-                self.majEntry()
-        
+                        
+                        #===========================================================
+                        # MAJ de la mapGroupe car les id de map ont change mais pas ceux de mapgroupe
+                        #===========================================================
+                        self.majMapGroupe(i, r)
+                     
+                    print ("MAP APRES: " + self.map.__str__())
+                    print ("MAPGRP APRES: " + self.mapGroupe.__str__())
+                    self.idForme = r
+                    self.ClicDroit_depart = self.ClicDroit_fin
+                    self.majEntry()
     def clic_btn_creation(self, forme):
         self.PeutDessiner = 1
         print(forme)
