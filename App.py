@@ -27,12 +27,13 @@ class App(Tk):
         self.map = {}
         self.mapGroupe = {}
         self.nbFormes = 0
+        self.PeutDessiner = FALSE
         
         self.tabpoints = [None]*2
         
         self.i = 0
         self.j = 0
-        self.GroupeActif = None
+        self.GroupeActif = -1
         # Fenetre
         self.root = self
         self.root.title("Formes")
@@ -52,7 +53,7 @@ class App(Tk):
         cols = []
         self.forme_active = None
         self.idForme = None
-        self.zoom = 1.1;
+        self.zoom = 0;
         
         # Labels a droite
         ln = Label(propriete, text ='Nom')
@@ -167,6 +168,7 @@ class App(Tk):
         self.cv.bind("<Button3-Motion>", self.onZoomMove)
         self.cv.bind("<Button-2>", self.onMouseMolette)
         self.root.bind("<Control-g>", self.selectionGroupe)
+        self.root.bind("<Control-Up>", self.selectionSuperGroupe)
         #Entry
         self.entry_droite_name.bind('<Return>', self.modifByEdit)
         self.entry_droite_point1.bind('<Return>', self.modifByEdit)
@@ -197,7 +199,7 @@ class App(Tk):
         self.color_name = color[1]
         self.label_droite_couleur.configure(background=self.color_name)
         if(self.forme_active is not None):
-            if (self.GroupeActif is not None):
+            if (self.GroupeActif != -1):
                 #===========================================================
                 # #On colore tout le groupe actif
                 #===========================================================
@@ -307,8 +309,8 @@ class App(Tk):
             print ("modif")
             
     def majEntry(self):
-        if(self.idForme is not None and self.GroupeActif is None):
-            #Propre a une forme
+        if(self.idForme is not None and self.GroupeActif == -1):
+            #FORME SIMPLE
             print("=========majEntry=========")
             print ("IDFORME :" + self.idForme.__str__())
             print ("MAP: " + self.map.__str__())
@@ -330,8 +332,8 @@ class App(Tk):
                 self.comboBoxGroupe.current(self.map[self.idForme]._groupe)
             else:
                 self.comboBoxGroupe.current(0)
-        elif (self.GroupeActif is not None):
-            print ("GROUPE ACTIFFFFFFFFFF")
+        elif (self.GroupeActif != -1):
+            print ("GROUPE ACTIF")
             self.Valeur_entry_nom.set(self.mapGroupe[self.GroupeActif]._get_nom())
             #couleur
             self.label_droite_couleur.configure(background=self.map[self.idForme]._get_couleur())
@@ -343,9 +345,13 @@ class App(Tk):
             self.Valeur_entry_hauteur.set(self.map[self.idForme]._get_hauteur().__str__())
             #largeur
             self.Valeur_entry_largeur.set(self.map[self.idForme]._get_largeur().__str__())
-            
-            self.comboBoxGroupe.current(0) 
+            #liste deroulante
+            if (self.mapGroupe[self.map[self.idForme]._groupe]._groupe != -1):
+                self.comboBoxGroupe.current(self.mapGroupe[self.map[self.idForme]._groupe]._groupe)
+            else:
+                self.comboBoxGroupe.current(0)
         else:
+            print ("AUCUNE SELECTION")
             self.Valeur_entry_nom.set('')
             self.label_droite_couleur.configure(background='')
             self.Valeur_entry_point1.set('')
@@ -360,8 +366,7 @@ class App(Tk):
             self.Valeur_entry_zoom.set(self.zoom.__str__())
             
         #groupe actif ou pas
-        if(self.GroupeActif is None) or (self.GroupeActif == False):
-            
+        if(self.GroupeActif  == -1):
             self.Valeur_labelgroupeactif.set("Aucun");
         else :
             self.Valeur_labelgroupeactif.set( self.mapGroupe[self.GroupeActif]._get_nom() );
@@ -369,9 +374,6 @@ class App(Tk):
     def onMouseClic(self, event):
         items = self.cv.find_withtag('current')
         self.ClicGauche_depart = Point(event.x, event.y)
-        
-        #on deselectionne la forme active actuelle (suppression du contour)
-#A FAIRE        
         
         if len(items):
             print("selection forme")
@@ -385,10 +387,11 @@ class App(Tk):
             print ("ID: " + self.idForme.__str__())
             
             print ("NOM: " +  self.forme_active._get_nom())
+            self.majEntry()
         else:
             try:
                 print("dessinDown")
-                if self.PeutDessiner == 1 :
+                if self.PeutDessiner :
                     #id de la forme sur le canvas
                     self.forme_active.maj(Point(event.x, event.y), Point(event.x,event.y))
                     self.forme_active.write()
@@ -396,15 +399,14 @@ class App(Tk):
                     self.map[self.idForme] = self.forme_active
                 else :
                     #Deselection de tout
-                    self.GroupeActif = None
-                
+                    self.GroupeActif = -1
+                self.majEntry()
             except:pass  #ne rien faire quand aucune action est selectionnee (clic dans le vide)
-        self.majEntry()
         #self.root.update()
 
     def onMouseUp(self, event):
-        if self.PeutDessiner == 1 : 
-            self.PeutDessiner = 0
+        if self.PeutDessiner : 
+            self.PeutDessiner = FALSE
         print("lache")
         
     #bouge la souris + clic gauche
@@ -427,7 +429,7 @@ class App(Tk):
                 #----------------
                 # TRANSLATION
                 #----------------
-                if(self.GroupeActif is not None):
+                if(self.GroupeActif != -1):
                     
                     #===== GROUPE ========= On bouge tout le groupe de la forme active
                     
@@ -437,12 +439,20 @@ class App(Tk):
                     #if(self.GroupeActif is not None):
                     print("MAP GROUPE = "+self.mapGroupe.__str__() )
                     
-                    #MAJ des objets
+                    print("TRANSLATION GROUPE")
+                    #TRANSLATION du groupe
                     self.mapGroupe[self.GroupeActif].translation(x_vecteur, y_vecteur)
-                    
                     for id in self.mapGroupe[self.GroupeActif].listeforme:
                         #Maj du Canvas
                         self.cv.move(id, x_vecteur, y_vecteur)
+                    #TRANSLATION des autres lies
+                    for g in self.mapGroupe: #pour chaque groupe de la mapGroupe
+                        if (self.GroupeActif == self.mapGroupe[g]._groupe): #si le groupe est lie a l'actuel
+                            self.mapGroupe[g].translation(x_vecteur, y_vecteur)
+                            for id in self.mapGroupe[g].listeforme:
+                                #Maj du Canvas
+                                self.cv.move(id, x_vecteur, y_vecteur)
+
                 else:
                     #On bouge que la forme elle-meme
                     #MAJ Canvas
@@ -470,7 +480,7 @@ class App(Tk):
             #modifie le dessin
             
             try:
-                if self.PeutDessiner == 1 :
+                if self.PeutDessiner :
                     print("NOMdown:" + self.forme_active._get_nom())
                     self.cv.delete(self.idForme) #supprime l'ancienne forme du canvas
                     del self.map[self.idForme]  #supprime l'ancinne forme de la map
@@ -495,7 +505,9 @@ class App(Tk):
     
     def onZoomMove(self, event):
         if self.idForme is not None:
-            #Zoom que par deplacement vertical
+            #--------------------------------
+            #ZOOM que par deplacement vertical
+            #---------------------------------
             if True:
                 print("===============Bouge clic2 Droit================="+ event.x.__str__() + " ; " + event.y.__str__() )
                 #recupere l'endroit actuel de la souris
@@ -536,23 +548,41 @@ class App(Tk):
                     #Action de zoom/dezoom sur une forme/groupe 
                     #-------------------------------------------
                     #MAJ des objets
-                    if(self.GroupeActif is not None):
+                    if(self.GroupeActif != -1):
                         #---------------
                         # GROUPE
                         #---------------
-                        if action == True :
-                            print("ZOOM GROUPE")
-                            #MAJ des objets
-                            self.mapGroupe[self.GroupeActif].zoom(coef);
-                        else:
-                            print("DEZOOM GROUPE")
-                            #MAJ des objets
-                            self.mapGroupe[self.GroupeActif].dezoom(coef);
                             
+                        print("ZOOM GROUPE")
+                        #ZOOM du groupe
+                        self.mapGroupe[self.GroupeActif].zoom(action, coef)
+                        #ZOOM des autres lies
+                        for g in self.mapGroupe: #pour chaque groupe de la mapGroupe
+                            if (self.GroupeActif == self.mapGroupe[g]._groupe): #si le groupe est lie a l'actuel
+                                self.mapGroupe[g].zoom(action, coef)
+                                #MISE A JOUR DU GROUPE PARCOURU
+                                for index in self.mapGroupe[g].listeforme:
+                                    self.cv.delete(index);
+                                    #VISUEL:Dessine toutes les formes du groupe
+                                    x = self.fabrique.fabriquer_forme(self.mapGroupe[g].listeforme[index], self.cv)
+                                    
+                                    #DONNEES
+                                    self.map[x] = self.map[index]
+                                    # MAJ de la mapGroupe car les id de map ont change mais pas ceux de mapgroupe
+                                    self.majMapGroupe(index, x)
+                                    #Suppression de l'ancienne forme
+                                    del self.map[index]
+                                    #Conserve la Forme selectionnee
+                                    if index == self.idForme:
+                                        self.idForme = x
+                                            
+                                            
+                        #MISE A JOUR DU GROUPE ACTUEL 
                         for index in self.mapGroupe[self.GroupeActif].listeforme:
+                            self.cv.delete(index);
                             #VISUEL:Dessine toutes les formes du groupe
                             x = self.fabrique.fabriquer_forme(self.mapGroupe[self.GroupeActif].listeforme[index], self.cv)
-                            self.cv.delete(index);
+                            
                             
                             #DONNEES
                             self.map[x] = self.map[index]
@@ -567,12 +597,9 @@ class App(Tk):
                         #---------------
                         #FORME
                         #---------------
-                        if action == True :
-                            self.forme_active.zoom(coef)
-                            #self.forme_active.translation( DistanceX - DistanceX * coef, DistanceY - DistanceY * coef)#Deplace selon le coef
-                        else:
-                            self.forme_active.dezoom(coef)
-                            #self.forme_active.translation( DistanceX - DistanceX / coef, DistanceY - DistanceY / coef)#Deplace selon le coef
+                        self.forme_active.zoom(action, coef)
+                        #self.forme_active.translation( DistanceX - DistanceX * coef, DistanceY - DistanceY * coef)#Deplace selon le coef
+                       
                         #Suppression de l'ancienne forme
                         del self.map[i]
                         #VISUEL: Dessine la forme active
@@ -583,33 +610,13 @@ class App(Tk):
                         self.majMapGroupe(i, r)
                         if i == self.idForme:#Forme selectionnee
                             self.idForme = r
-                            
-#                     #Suppression de l'ancienne forme
-#                     del self.map[i]
-#                     
-#                     # MISE A JOUR VISUELLE: DESSIN
-#                      
-#                     if i == self.idForme:#Forme selectionnee
-#                         self.idForme = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
-#                         self.map[self.idForme] = self.forme_active
-#                         r = self.idForme
-#                     else:# Les autres Formes
-#                         j = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
-#                         self.map[j] = self.forme_active
-#                         r = j
-                        
-#                         #===========================================================
-#                         # MAJ de la mapGroupe car les id de map ont change mais pas ceux de mapgroupe
-#                         #===========================================================
-#                         self.majMapGroupe(i, r)
-                     
                     print ("MAP APRES: " + self.map.__str__())
                     print ("MAPGRP APRES: " + self.mapGroupe.__str__())
                     #self.idForme = r
                     self.ClicDroit_depart = self.ClicDroit_fin
                     self.majEntry()
     def clic_btn_creation(self, forme):
-        self.PeutDessiner = 1
+        self.PeutDessiner = TRUE
         print(forme)
         self.nbFormes = self.nbFormes + 1
         
@@ -647,11 +654,12 @@ class App(Tk):
         self.fenetreGroupe.withdraw()
         self.listeGroupes.append(groupe)
         self.comboBoxGroupe.configure(values= self.listeGroupes)
-        self.mapGroupe[len(self.listeGroupes) - 1] = FormesComposees(groupe, {}) #listeforme de mapGroupe est une liste vide
+        self.mapGroupe[len(self.listeGroupes) - 1] = FormesComposees(groupe, {}) #listeforme de mapGroupe est un dictionnaire vide
         
     def onChangeCombobox(self, lol):
-        if (self.GroupeActif is None):   
-            if (self.comboBoxGroupe.current() != 0): # si un groupe selectionne dans la box   
+        if (self.GroupeActif == -1):   
+            if (self.comboBoxGroupe.current() != 0): # si un groupe selectionne dans la box
+                print("allocation") 
                 if(self.map[self.idForme]._groupe != -1): # si la forme a deja un groupe on la change de groupe
                     self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)
                     self.map[self.idForme]._groupe = -1
@@ -659,27 +667,43 @@ class App(Tk):
                 self.map[self.idForme]._groupe = self.comboBoxGroupe.current()
                 print ("MAPGROUPE= "+self.mapGroupe.__str__())
             else: # si aucun groupe selectionne dans la box
+                print("desallocation")
                 if(self.map[self.idForme]._groupe != -1): # on retire la forme du groupe
                     self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)
                     self.map[self.idForme]._groupe = -1 
-        else:
-            if (self.comboBoxGroupe.current() != 0): # si un groupe selectionne dans la box   
-                self.mapGroupe[self.GroupeActif]._groupe = self.comboBoxGroupe.current()
-                self.mapGroupe[self.comboBoxGroupe.current()]._ajouter_forme(self.GroupeActif, self.mapGroupe[self.GroupeActif])
-            
+        else: #Changement a tout un groupe
+            if (self.comboBoxGroupe.current() != 0): # Selection d'un groupe
+                print("SUPERallocation")   
+                self.mapGroupe[self.GroupeActif]._groupe = self.comboBoxGroupe.current() #sous groupe du groupe selectionne
+                #self.mapGroupe[self.comboBoxGroupe.current()]._ajouter_forme(self.GroupeActif, self.mapGroupe[self.GroupeActif]) #ajoute le groupe actif au groupe choisi
                 
-    def selectionGroupe(self, event):
-        print("==================SelectionneTouteFormeDuGroupe============")
+                
+                
+                
+            else:#Desallocation d'un superGroupe
+                print("SUPERdesalocation")
+                self.mapGroupe[self.GroupeActif]._groupe = -1
+                
+                
+    def selectionGroupe(self, event): #appele par CtrlG
+        #print("==================SelectionneTouteFormeDuGroupe============")
         
-        if(self.GroupeActif is None) :
+        if(self.GroupeActif == -1) : #Selection car aucun selectionne
+            print("===Selection GROUPE car aucun selectionne")
             self.GroupeActif = self.map[self.idForme]._groupe
         else:
-            if (self.mapGroupe[self.GroupeActif]._groupe != -1):
-                self.GroupeActif = self.mapGroupe[self.GroupeActif]._groupe
-            else:
-                self.GroupeActif = None
-        
+            print("===Deselection GROUPE")
+            self.GroupeActif = -1 #deselectionne
         self.majEntry()
+    
+    
+    def selectionSuperGroupe(self, event):
+        if (self.GroupeActif != -1 and self.mapGroupe[self.GroupeActif]._groupe != -1):
+            print("===Selectionne superGROUPE car deja un selectionne et en plus forme appartient a un groupe")
+            self.GroupeActif = self.mapGroupe[self.GroupeActif]._groupe
+            self.majEntry()
+        
+        
         
     def majMapGroupe(self, idoriginal, nouvelid):
         #===========================================================
@@ -691,7 +715,8 @@ class App(Tk):
                 self.mapGroupe[g]._supprimer_forme(idoriginal); #supprime l'ancienne forme
                 self.mapGroupe[g]._ajouter_forme(nouvelid, self.map[nouvelid]); #ajoute la nouvelle forme
             
-         
+                    
+        
 if(__name__ == '__main__'):
     application = App()    # Instanciation de la classe
     application.mainloop()        # Boucle pour garder le programme en vie

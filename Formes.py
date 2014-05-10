@@ -20,6 +20,4 @@ class Formes:
     
     def zoom(self): pass
     
-    def dezoom(self): pass
-    
     def selectionner(self, canvas, id): pass

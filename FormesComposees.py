@@ -20,21 +20,17 @@ class FormesComposees(Formes):
     def _supprimer_forme(self, id):
         del self._listeforme[id];
     
-    def zoom(self, coeff):
-        print ("--- ZOOM GROUPE ---")
-        for id in self._listeforme:
-            self._listeforme[id].zoom(coeff)
-            
-    def dezoom(self, coeff):
-        print ("--- DEZOOM GROUPE ---")
-        for id in self._listeforme:
-            self._listeforme[id].dezoom(coeff)
+    def zoom(self, action, coeff):
+            print ("--- HOMOTHETIE GROUPE ---")
+            for id in self._listeforme:
+                self._listeforme[id].zoom(action, coeff)
             
     def translation(self, x, y):
-        #super().translation()
+        super().translation();
         print ("--- TRANSLATION GROUPE ---")
         for id in self._listeforme:
             self._listeforme[id].translation(x, y)
+            
         
     def write(self):
         super().write()

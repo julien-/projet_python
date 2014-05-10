@@ -53,24 +53,22 @@ class FormesSimples(Formes):
         self._point1 = Point(self._point1._get_x() + x, self._point1._get_y() + y)
         self._point2 = Point(self._point2._get_x() + x, self._point2._get_y() + y)
     
-    def zoom(self, coef):
+    def zoom(self, action, coef):
         super().zoom()
-        #Modif des points
-        AModifX = round( ((self._get_largeur() * coef) - self._get_largeur()) / 2 , 0)
-        AModifY = round( ((self._get_hauteur() * coef) - self._get_hauteur()) / 2 , 0 )
-        
-        self._point1 = Point(self._point1._get_x() - AModifX, self._point1._get_y() - AModifY)
-        self._point2 = Point(self._point2._get_x() + AModifX, self._point2._get_y() + AModifY)
-        
-        
-    def dezoom(self, coef):
-        super().zoom()
-        #Modif des points
-        AModifX = round( ((self._get_largeur() / coef) - self._get_largeur()) / 2 , 0)
-        AModifY = round( ((self._get_hauteur() / coef) - self._get_hauteur()) / 2 , 0 )
-        
-        self._point1 = Point(self._point1._get_x() - AModifX, self._point1._get_y() - AModifY)
-        self._point2 = Point(self._point2._get_x() + AModifX, self._point2._get_y() + AModifY)
+        if(action):
+            #Modif des points
+            AModifX = round( ((self._get_largeur() * coef) - self._get_largeur()) / 2 , 0)
+            AModifY = round( ((self._get_hauteur() * coef) - self._get_hauteur()) / 2 , 0 )
+            
+            self._point1 = Point(self._point1._get_x() - AModifX, self._point1._get_y() - AModifY)
+            self._point2 = Point(self._point2._get_x() + AModifX, self._point2._get_y() + AModifY)
+        else:
+            #Modif des points
+            AModifX = round( ((self._get_largeur() / coef) - self._get_largeur()) / 2 , 0)
+            AModifY = round( ((self._get_hauteur() / coef) - self._get_hauteur()) / 2 , 0 )
+            
+            self._point1 = Point(self._point1._get_x() - AModifX, self._point1._get_y() - AModifY)
+            self._point2 = Point(self._point2._get_x() + AModifX, self._point2._get_y() + AModifY)
         
         
     def _get_hauteur(self):
