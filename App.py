@@ -307,7 +307,7 @@ class App(Tk):
             print ("modif")
             
     def majEntry(self):
-        if(self.idForme is not None):
+        if(self.idForme is not None and self.GroupeActif is None):
             #Propre a une forme
             print("=========majEntry=========")
             print ("IDFORME :" + self.idForme.__str__())
@@ -330,6 +330,21 @@ class App(Tk):
                 self.comboBoxGroupe.current(self.map[self.idForme]._groupe)
             else:
                 self.comboBoxGroupe.current(0)
+        elif (self.GroupeActif is not None):
+            print ("GROUPE ACTIFFFFFFFFFF")
+            self.Valeur_entry_nom.set(self.mapGroupe[self.GroupeActif]._get_nom())
+            #couleur
+            self.label_droite_couleur.configure(background=self.map[self.idForme]._get_couleur())
+            #point1
+            self.Valeur_entry_point1.set(self.map[self.idForme]._get_point1()._get_x().__str__() + "," + self.map[self.idForme]._get_point1()._get_y().__str__())
+            #point2
+            self.Valeur_entry_point2.set(self.map[self.idForme]._get_point2()._get_x().__str__() + "," + self.map[self.idForme]._get_point2()._get_y().__str__())
+            #hauteur
+            self.Valeur_entry_hauteur.set(self.map[self.idForme]._get_hauteur().__str__())
+            #largeur
+            self.Valeur_entry_largeur.set(self.map[self.idForme]._get_largeur().__str__())
+            
+            self.comboBoxGroupe.current(0) 
         else:
             self.Valeur_entry_nom.set('')
             self.label_droite_couleur.configure(background='')
@@ -635,17 +650,23 @@ class App(Tk):
         self.mapGroupe[len(self.listeGroupes) - 1] = FormesComposees(groupe, {}) #listeforme de mapGroupe est une liste vide
         
     def onChangeCombobox(self, lol):
-        if (self.comboBoxGroupe.current() != 0):
-            if(self.map[self.idForme]._groupe != -1):            
-                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)
-                self.map[self.idForme]._groupe = -1        
-            self.mapGroupe[self.comboBoxGroupe.current()]._ajouter_forme(self.idForme, self.map[self.idForme])
-            self.map[self.idForme]._groupe = self.comboBoxGroupe.current()
-            print ("MAPGROUPE= "+self.mapGroupe.__str__())
+        if (self.GroupeActif is None):   
+            if (self.comboBoxGroupe.current() != 0): # si un groupe selectionne dans la box   
+                if(self.map[self.idForme]._groupe != -1): # si la forme a deja un groupe on la change de groupe
+                    self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)
+                    self.map[self.idForme]._groupe = -1
+                self.mapGroupe[self.comboBoxGroupe.current()]._ajouter_forme(self.idForme, self.map[self.idForme])
+                self.map[self.idForme]._groupe = self.comboBoxGroupe.current()
+                print ("MAPGROUPE= "+self.mapGroupe.__str__())
+            else: # si aucun groupe selectionne dans la box
+                if(self.map[self.idForme]._groupe != -1): # on retire la forme du groupe
+                    self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)
+                    self.map[self.idForme]._groupe = -1 
         else:
-            if(self.map[self.idForme]._groupe != -1):
-                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)
-                self.map[self.idForme]._groupe = -1 
+            if (self.comboBoxGroupe.current() != 0): # si un groupe selectionne dans la box   
+                self.mapGroupe[self.GroupeActif]._groupe = self.comboBoxGroupe.current()
+                self.mapGroupe[self.comboBoxGroupe.current()]._ajouter_forme(self.GroupeActif, self.mapGroupe[self.GroupeActif])
+            
                 
     def selectionGroupe(self, event):
         print("==================SelectionneTouteFormeDuGroupe============")
@@ -653,7 +674,10 @@ class App(Tk):
         if(self.GroupeActif is None) :
             self.GroupeActif = self.map[self.idForme]._groupe
         else:
-            self.GroupeActif = None
+            if (self.mapGroupe[self.GroupeActif]._groupe != -1):
+                self.GroupeActif = self.mapGroupe[self.GroupeActif]._groupe
+            else:
+                self.GroupeActif = None
         
         self.majEntry()
         
