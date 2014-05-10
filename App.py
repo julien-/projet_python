@@ -196,23 +196,24 @@ class App(Tk):
         color = colorchooser.askcolor()
         self.color_name = color[1]
         self.label_droite_couleur.configure(background=self.color_name)
-        if (self.GroupeActif is not None):
-            #===========================================================
-            # #On colore tout le groupe actif
-            #===========================================================
-            print("==================ColorationDuGroupe="+self.GroupeActif.__str__()+"===========")
-            print("MAP GROUPE = "+self.mapGroupe.__str__() )
-            copie = deepcopy(self.forme_active)
-            for id in self.mapGroupe[self.GroupeActif].listeforme:
-                #MAJ des objets
-                self.map[id]._set_couleur(self.color_name)
-                #Maj du Canvas
-                self.regenererForme(id)
-        else:
-            self.forme_active._set_couleur(self.color_name)
-            self.regenererForme()
-        
-        print("Changement de couleur entry_droite_name : ",self.color_name)
+        if(self.forme_active is not None):
+            if (self.GroupeActif is not None):
+                #===========================================================
+                # #On colore tout le groupe actif
+                #===========================================================
+                print("==================ColorationDuGroupe="+self.GroupeActif.__str__()+"===========")
+                print("MAP GROUPE = "+self.mapGroupe.__str__() )
+                copie = deepcopy(self.forme_active)
+                for id in self.mapGroupe[self.GroupeActif].listeforme:
+                    #MAJ des objets
+                    self.map[id]._set_couleur(self.color_name)
+                    #Maj du Canvas
+                    self.regenererForme(id)
+            else:
+                self.forme_active._set_couleur(self.color_name)
+                self.regenererForme()
+            
+            print("Changement de couleur entry_droite_name : ",self.color_name)
         
     def onMouseMolette(self, event):
         self.coordPoint = Point(event.x, event.y)
@@ -244,10 +245,10 @@ class App(Tk):
     
     def supprimerForme(self, event):
         items = self.cv.find_withtag('current')
-        #Si on selectionne une formes
+        #Si on selectionne une forme
         if len(items):
             if(self.map[self.idForme]._groupe != -1):            
-                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)        
+                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme, self.map[self.idForme])        
             del self.map[self.idForme]
             self.cv.delete(self.root,self.idForme)
             self.idForme = None
@@ -408,21 +409,25 @@ class App(Tk):
             #Gestion dans le cadre du canvas
             if (((self.map[self.idForme])._get_point1()._get_x() + x_vecteur) >= 0) and (((self.map[self.idForme])._get_point2()._get_x() + x_vecteur) <= self.cv.winfo_width() and (((self.map[self.idForme])._get_point1()._get_y() + y_vecteur) >= 0) and (((self.map[self.idForme])._get_point2()._get_y() + y_vecteur) <= self.cv.winfo_height())):
                 print ("entre  a " + ((self.map[self.idForme])._get_point1()._get_x() + x_vecteur).__str__())
-                
+                #----------------
+                # TRANSLATION
+                #----------------
                 if(self.GroupeActif is not None):
-                    #===========================================================
-                    # #On bouge tout le groupe de la forme active
-                    #===========================================================
+                    
+                    #===== GROUPE ========= On bouge tout le groupe de la forme active
+                    
                     print("BOUGE le groupe de " + x_vecteur.__str__() + " , " + y_vecteur.__str__())
                     print("==================BougeTouteFormeDuGroupe="+self.GroupeActif.__str__()+"===========")
                     #On bouge tout le groupe de la forme en mouvement dans onMouseMove
-                    if(self.GroupeActif is not None) :
-                        print("MAP GROUPE = "+self.mapGroupe.__str__() )
-                        for id in self.mapGroupe[self.GroupeActif].listeforme:
-                            #Maj du Canvas
-                            self.cv.move(id, x_vecteur, y_vecteur)
-                            #MAJ des objets
-                            self.map[id].translation(x_vecteur, y_vecteur)
+                    #if(self.GroupeActif is not None):
+                    print("MAP GROUPE = "+self.mapGroupe.__str__() )
+                    
+                    #MAJ des objets
+                    self.mapGroupe[self.GroupeActif].translation(x_vecteur, y_vecteur)
+                    
+                    for id in self.mapGroupe[self.GroupeActif].listeforme:
+                        #Maj du Canvas
+                        self.cv.move(id, x_vecteur, y_vecteur)
                 else:
                     #On bouge que la forme elle-meme
                     #MAJ Canvas
@@ -507,40 +512,85 @@ class App(Tk):
                     self.cv.delete(i) #supprime l'ancienne forme du canvas
                     print("i="+i.__str__())
                     self.forme_active = self.map[i] #copie intermediaire (forme_active a associer au CANVAS )
-                    del self.map[i]
-                    #Agrandit/Retrecit l'objet
-                    if action == True :
-                        self.forme_active.zoom(coef)
-                    else:
-                        self.forme_active.dezoom(coef)
                     
-                    #----------Deplace selon l'endroit du clic pour pouvoir chosir son endroit du zoom
+                    #----------Deplace selon l'endroit du clic pour pouvoir choisir son endroit du zoom
                     #Difference entre l'endroit du clic et le milieu de la forme
-                    DistanceX = self.ClicDroit_fin._get_x() - self.forme_active._get_milieu()._get_x()
-                    DistanceY = self.ClicDroit_fin._get_y() - self.forme_active._get_milieu()._get_y()
-                    #Deplace selon le coef
-                    if action == True :
-                        self.forme_active.translation( DistanceX - DistanceX * coef, DistanceY - DistanceY * coef)
+                    #DistanceX = self.ClicDroit_fin._get_x() - self.forme_active._get_milieu()._get_x()
+                    #DistanceY = self.ClicDroit_fin._get_y() - self.forme_active._get_milieu()._get_y()
+                    #-------------------------------------------
+                    #Action de zoom/dezoom sur une forme/groupe 
+                    #-------------------------------------------
+                    #MAJ des objets
+                    if(self.GroupeActif is not None):
+                        #---------------
+                        # GROUPE
+                        #---------------
+                        if action == True :
+                            print("ZOOM GROUPE")
+                            #MAJ des objets
+                            self.mapGroupe[self.GroupeActif].zoom(coef);
+                        else:
+                            print("DEZOOM GROUPE")
+                            #MAJ des objets
+                            self.mapGroupe[self.GroupeActif].dezoom(coef);
+                            
+                        for index in self.mapGroupe[self.GroupeActif].listeforme:
+                            #VISUEL:Dessine toutes les formes du groupe
+                            x = self.fabrique.fabriquer_forme(self.mapGroupe[self.GroupeActif].listeforme[index], self.cv)
+                            self.cv.delete(index);
+                            
+                            #DONNEES
+                            self.map[x] = self.map[index]
+                            # MAJ de la mapGroupe car les id de map ont change mais pas ceux de mapgroupe
+                            self.majMapGroupe(index, x)
+                            #Suppression de l'ancienne forme
+                            del self.map[index]
+                            #Conserve la Forme selectionnee
+                            if index == self.idForme:
+                                self.idForme = x
                     else:
-                        self.forme_active.translation( DistanceX - DistanceX / coef, DistanceY - DistanceY / coef)
-                    #Garde la forme selectionnee 
-                    if i == self.idForme:
+                        #---------------
+                        #FORME
+                        #---------------
+                        if action == True :
+                            self.forme_active.zoom(coef)
+                            #self.forme_active.translation( DistanceX - DistanceX * coef, DistanceY - DistanceY * coef)#Deplace selon le coef
+                        else:
+                            self.forme_active.dezoom(coef)
+                            #self.forme_active.translation( DistanceX - DistanceX / coef, DistanceY - DistanceY / coef)#Deplace selon le coef
+                        #Suppression de l'ancienne forme
+                        del self.map[i]
+                        #VISUEL: Dessine la forme active
                         self.idForme = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
                         self.map[self.idForme] = self.forme_active
                         r = self.idForme
-                    else:
-                        j = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
-                        self.map[j] = self.forme_active
-                        r = j
-                        
-                        #===========================================================
                         # MAJ de la mapGroupe car les id de map ont change mais pas ceux de mapgroupe
-                        #===========================================================
                         self.majMapGroupe(i, r)
+                        if i == self.idForme:#Forme selectionnee
+                            self.idForme = r
+                            
+#                     #Suppression de l'ancienne forme
+#                     del self.map[i]
+#                     
+#                     # MISE A JOUR VISUELLE: DESSIN
+#                      
+#                     if i == self.idForme:#Forme selectionnee
+#                         self.idForme = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
+#                         self.map[self.idForme] = self.forme_active
+#                         r = self.idForme
+#                     else:# Les autres Formes
+#                         j = self.fabrique.fabriquer_forme(self.forme_active, self.cv)
+#                         self.map[j] = self.forme_active
+#                         r = j
+                        
+#                         #===========================================================
+#                         # MAJ de la mapGroupe car les id de map ont change mais pas ceux de mapgroupe
+#                         #===========================================================
+#                         self.majMapGroupe(i, r)
                      
                     print ("MAP APRES: " + self.map.__str__())
                     print ("MAPGRP APRES: " + self.mapGroupe.__str__())
-                    self.idForme = r
+                    #self.idForme = r
                     self.ClicDroit_depart = self.ClicDroit_fin
                     self.majEntry()
     def clic_btn_creation(self, forme):
@@ -582,19 +632,19 @@ class App(Tk):
         self.fenetreGroupe.withdraw()
         self.listeGroupes.append(groupe)
         self.comboBoxGroupe.configure(values= self.listeGroupes)
-        self.mapGroupe[len(self.listeGroupes) - 1] = FormesComposees(groupe, 0, {}) #listeforme de mapGroupe est un dictionnaire vide
+        self.mapGroupe[len(self.listeGroupes) - 1] = FormesComposees(groupe, {}) #listeforme de mapGroupe est une liste vide
         
     def onChangeCombobox(self, lol):
         if (self.comboBoxGroupe.current() != 0):
             if(self.map[self.idForme]._groupe != -1):            
-                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)
+                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme, self.map[self.idForme])
                 self.map[self.idForme]._groupe = -1        
-            self.mapGroupe[self.comboBoxGroupe.current()]._ajouter_forme(self.idForme)
+            self.mapGroupe[self.comboBoxGroupe.current()]._ajouter_forme(self.idForme, self.map[self.idForme])
             self.map[self.idForme]._groupe = self.comboBoxGroupe.current()
             print ("MAPGROUPE= "+self.mapGroupe.__str__())
         else:
             if(self.map[self.idForme]._groupe != -1):
-                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)
+                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme, self.map[self.idForme])
                 self.map[self.idForme]._groupe = -1 
                 
     def selectionGroupe(self, event):
@@ -614,8 +664,8 @@ class App(Tk):
         
         for g in self.mapGroupe: #pour chaque groupe de la mapGroupe
             if ( any(idoriginal == val for val in self.mapGroupe[g].listeforme) ): #si la forme fait partie du groupe
-                del self.mapGroupe[g].listeforme[idoriginal] #supprime l'ancien element
-                self.mapGroupe[g].listeforme[nouvelid] = 1 #ajoute le nouveau
+                self.mapGroupe[g]._supprimer_forme(idoriginal); #supprime l'ancienne forme
+                self.mapGroupe[g]._ajouter_forme(nouvelid, self.map[nouvelid]); #ajoute la nouvelle forme
             
          
 if(__name__ == '__main__'):

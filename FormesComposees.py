@@ -2,10 +2,9 @@ from Formes import Formes
 
 class FormesComposees(Formes):
 
-    def __init__(self, nom, nbFormes, listeforme):
+    def __init__(self, nom, listeforme):
         super(FormesComposees,self).__init__(nom)
         self._listeforme = listeforme
-        self._nbFormes = nbFormes 
         
     def _get_listeforme(self):
         return self._listeforme
@@ -15,30 +14,33 @@ class FormesComposees(Formes):
 
     listeforme = property (_get_listeforme, _set_listeforme)
     
-    def _ajouter_forme(self, idforme):
-        self._listeforme[idforme] = 1
-        
-    def _supprimer_forme(self, idforme):    
-        del self._listeforme[idforme]
+    def _ajouter_forme(self, id, forme):
+        self._listeforme[id] = forme;
+         
+    def _supprimer_forme(self, id):
+        del self._listeforme[id];
     
     def zoom(self, coeff):
         print ("--- ZOOM GROUPE ---")
-        for i in self._listeforme:
-            self._listeforme[i].zoom(coeff)
+        for id in self._listeforme:
+            self._listeforme[id].zoom(coeff)
             
     def dezoom(self, coeff):
         print ("--- DEZOOM GROUPE ---")
-        for i in self._listeforme:
-            self._listeforme[i].dezoom(coeff)
+        for id in self._listeforme:
+            self._listeforme[id].dezoom(coeff)
             
     def translation(self, x, y):
-        super().translation()
+        #super().translation()
         print ("--- TRANSLATION GROUPE ---")
-        for i in self._listeforme:
-            self._listeforme[i].translation(x, y)
+        for id in self._listeforme:
+            self._listeforme[id].translation(x, y)
         
     def write(self):
         super().write()
         print (" * Formes dans ce groupe: ")
         for i in self._listeforme:
             self._listeforme[i].write()
+    
+    def getForme(self, id):
+        return self._listeforme[id]
