@@ -248,7 +248,7 @@ class App(Tk):
         #Si on selectionne une forme
         if len(items):
             if(self.map[self.idForme]._groupe != -1):            
-                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme, self.map[self.idForme])        
+                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)        
             del self.map[self.idForme]
             self.cv.delete(self.root,self.idForme)
             self.idForme = None
@@ -637,14 +637,14 @@ class App(Tk):
     def onChangeCombobox(self, lol):
         if (self.comboBoxGroupe.current() != 0):
             if(self.map[self.idForme]._groupe != -1):            
-                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme, self.map[self.idForme])
+                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)
                 self.map[self.idForme]._groupe = -1        
             self.mapGroupe[self.comboBoxGroupe.current()]._ajouter_forme(self.idForme, self.map[self.idForme])
             self.map[self.idForme]._groupe = self.comboBoxGroupe.current()
             print ("MAPGROUPE= "+self.mapGroupe.__str__())
         else:
             if(self.map[self.idForme]._groupe != -1):
-                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme, self.map[self.idForme])
+                self.mapGroupe[self.map[self.idForme]._groupe]._supprimer_forme(self.idForme)
                 self.map[self.idForme]._groupe = -1 
                 
     def selectionGroupe(self, event):
